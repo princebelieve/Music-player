@@ -1,0 +1,358 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background: #0a0a1a;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    overflow: hidden;
+}
+
+.video-container {
+    position: relative;
+    width: 100%;
+    max-width: 900px;
+    aspect-ratio: 16/9;
+    background: radial-gradient(ellipse at center, #1a0a2a, #0a0a1a);
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 0 80px rgba(255, 215, 0, 0.15);
+    border: 1px solid rgba(255, 215, 0, 0.1);
+    cursor: pointer;
+}
+
+/* ===== FIRE CANVAS (on top) ===== */
+#fireCanvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 6;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    mix-blend-mode: screen;
+}
+
+#fireCanvas.active {
+    opacity: 1;
+}
+
+/* ===== PARTICLE CANVAS (background) ===== */
+#particleCanvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 1;
+}
+
+/* ===== SPEAKERS ===== */
+.speaker {
+    position: absolute;
+    bottom: 130px;
+    z-index: 7;
+    font-size: 2.5rem;
+    opacity: 0.3;
+    pointer-events: none;
+    transition: all 0.2s ease;
+    text-shadow: 0 0 30px rgba(255, 215, 0, 0.1);
+}
+
+#speakerLeft {
+    left: 30px;
+}
+
+#speakerRight {
+    right: 30px;
+}
+
+.speaker.fire {
+    opacity: 1;
+    text-shadow: 
+        0 0 40px rgba(255, 100, 0, 0.8),
+        0 0 80px rgba(255, 50, 0, 0.6),
+        0 0 120px rgba(255, 0, 0, 0.4);
+    animation: speakerPulse 0.3s ease infinite alternate;
+}
+
+@keyframes speakerPulse {
+    0% { transform: scale(1); }
+    100% { transform: scale(1.3); }
+}
+
+/* ===== REST OF STYLES (same as before) ===== */
+.glow-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(ellipse at 50% 80%, rgba(255, 215, 0, 0.08), transparent 70%);
+    z-index: 2;
+    pointer-events: none;
+    animation: pulseGlow 4s ease-in-out infinite;
+}
+
+@keyframes pulseGlow {
+    0%, 100% { opacity: 0.5; }
+    50% { opacity: 1; }
+}
+
+.song-title {
+    position: absolute;
+    top: 20px;
+    left: 0;
+    width: 100%;
+    text-align: center;
+    z-index: 5;
+    color: rgba(255, 215, 0, 0.4);
+    font-size: clamp(0.8rem, 1.5vw, 1.2rem);
+    letter-spacing: 8px;
+    text-transform: uppercase;
+    font-weight: 300;
+    pointer-events: none;
+}
+
+.artist-name {
+    position: absolute;
+    top: 50px;
+    left: 0;
+    width: 100%;
+    text-align: center;
+    z-index: 5;
+    color: rgba(255, 255, 255, 0.1);
+    font-size: clamp(0.5rem, 0.8vw, 0.7rem);
+    letter-spacing: 4px;
+    pointer-events: none;
+}
+
+.visualizer {
+    position: absolute;
+    bottom: 100px;
+    left: 0;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+    gap: 4px;
+    z-index: 3;
+    height: 80px;
+    padding: 0 20px;
+}
+
+.bar {
+    flex: 1;
+    max-width: 20px;
+    min-width: 4px;
+    height: 10px;
+    background: linear-gradient(to top, #f5d742, #f5a623);
+    border-radius: 4px 4px 0 0;
+    box-shadow: 0 0 20px rgba(245, 215, 66, 0.3);
+    transition: height 0.1s ease;
+    transform-origin: bottom;
+}
+
+.lyric-container {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -55%);
+    z-index: 4;
+    width: 90%;
+    max-width: 700px;
+    text-align: center;
+    padding: 20px;
+    pointer-events: none;
+}
+
+#lyricDisplay {
+    font-size: clamp(1.6rem, 5vw, 3.2rem);
+    font-weight: 700;
+    color: #fff;
+    text-shadow: 0 0 30px rgba(255, 215, 0, 0.3);
+    line-height: 1.4;
+    min-height: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transform: scale(0.95) translateY(20px);
+    transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+#lyricDisplay.show {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+}
+
+#lyricDisplay .highlight {
+    color: #f5d742;
+    text-shadow: 0 0 40px rgba(245, 215, 66, 0.5);
+}
+
+@keyframes lyricIn {
+    0% { opacity: 0; transform: scale(0.9) translateY(30px); }
+    100% { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+@keyframes lyricOut {
+    0% { opacity: 1; transform: scale(1) translateY(0); }
+    100% { opacity: 0; transform: scale(0.95) translateY(-20px); }
+}
+
+#lyricDisplay.anim-in {
+    animation: lyricIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+#lyricDisplay.anim-out {
+    animation: lyricOut 0.3s ease forwards;
+}
+
+.timestamp {
+    position: absolute;
+    bottom: 20px;
+    right: 25px;
+    z-index: 5;
+    color: rgba(255, 255, 255, 0.2);
+    font-size: 0.8rem;
+    font-family: monospace;
+    pointer-events: none;
+}
+
+.controls {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 10;
+    display: flex;
+    gap: 12px;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(20px);
+    padding: 10px 20px;
+    border-radius: 50px;
+    border: 1px solid rgba(255, 215, 0, 0.1);
+}
+
+.controls button {
+    background: transparent;
+    border: none;
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 1.2rem;
+    padding: 6px 14px;
+    cursor: pointer;
+    border-radius: 30px;
+    transition: all 0.3s ease;
+    font-weight: 600;
+}
+
+.controls button:hover {
+    color: #f5d742;
+    background: rgba(255, 215, 0, 0.1);
+    transform: scale(1.05);
+}
+
+#statusText {
+    position: absolute;
+    bottom: 75px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 5;
+    color: rgba(255, 255, 255, 0.15);
+    font-size: 0.7rem;
+    letter-spacing: 2px;
+    pointer-events: none;
+    white-space: nowrap;
+}
+
+/* ===== FIRE INTENSITY OVERLAY ===== */
+.fire-overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 40%;
+    background: linear-gradient(to top, rgba(255, 50, 0, 0.15), transparent);
+    z-index: 2;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.5s ease;
+}
+
+.fire-overlay.active {
+    opacity: 1;
+    animation: firePulse 0.5s ease infinite alternate;
+}
+
+@keyframes firePulse {
+    0% { opacity: 0.3; }
+    100% { opacity: 0.8; }
+}
+
+@media (max-width: 600px) {
+    .controls {
+        padding: 8px 14px;
+        gap: 6px;
+        bottom: 15px;
+    }
+    .controls button {
+        font-size: 0.9rem;
+        padding: 4px 10px;
+    }
+    .visualizer {
+        bottom: 70px;
+        height: 50px;
+        gap: 3px;
+    }
+    .bar {
+        max-width: 12px;
+        min-width: 3px;
+    }
+    .lyric-container {
+        top: 45%;
+        transform: translate(-50%, -50%);
+        width: 95%;
+    }
+    #lyricDisplay {
+        font-size: clamp(1.2rem, 4vw, 1.8rem);
+        min-height: 60px;
+    }
+    .timestamp {
+        bottom: 65px;
+        right: 15px;
+        font-size: 0.6rem;
+    }
+    #statusText {
+        bottom: 60px;
+        font-size: 0.6rem;
+    }
+    .song-title {
+        top: 12px;
+        font-size: 0.6rem;
+        letter-spacing: 4px;
+    }
+    .artist-name {
+        top: 32px;
+        font-size: 0.4rem;
+    }
+    .speaker {
+        font-size: 1.5rem;
+        bottom: 95px;
+    }
+    #speakerLeft {
+        left: 15px;
+    }
+    #speakerRight {
+        right: 15px;
+    }
+}

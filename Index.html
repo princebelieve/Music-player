@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>🔥 ABANABAME - Silas Ibhadode</title>
+    <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<div class="video-container" id="videoContainer">
+    
+    <!-- Fire Canvas (on top of everything) -->
+    <canvas id="fireCanvas"></canvas>
+    
+    <!-- Particle Canvas -->
+    <canvas id="particleCanvas"></canvas>
+    
+    <div class="glow-overlay"></div>
+    
+    <div class="song-title">✦ ABANABAME • NA BONUS OO ✦</div>
+    <div class="artist-name">Silas Ibhadode</div>
+    
+    <div class="visualizer" id="visualizer"></div>
+    
+    <div class="lyric-container">
+        <div id="lyricDisplay">🎵 <span class="highlight">Loading...</span></div>
+    </div>
+    
+    <div id="statusText">⏹ PRESS PLAY</div>
+    <div class="timestamp" id="timestamp">00:00</div>
+    
+    <!-- Speaker with fire effect -->
+    <div class="speaker" id="speakerLeft">🔊</div>
+    <div class="speaker" id="speakerRight">🔊</div>
+    
+    <div class="controls">
+        <button id="playBtn">▶ PLAY</button>
+        <button id="resetBtn">⟳</button>
+        <button id="fullscreenBtn">⛶</button>
+    </div>
+    
+    <audio id="audioPlayer" preload="auto"></audio>
+</div>
+
+<script src="player.js"></script>
+</body>
+</html>
