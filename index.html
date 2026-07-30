@@ -297,7 +297,13 @@
 
             // Sync with audio if playing
             if (audioLoaded && !audioPlayer.paused && audioPlayer.currentTime > 0) {
-                updateLyric(audioPlayer.currentTime);
+               const lyricTime = audioPlayer.currentTime - 13;
+
+            if (lyricTime >= 0) {
+               updateLyric(lyricTime);
+            } else {
+               lyricDisplay.innerHTML = '🎶';
+            }
             }
 
             const lastTime = lyrics[lyrics.length - 1].time;
