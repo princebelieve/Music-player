@@ -15,6 +15,7 @@
     const visualizer = document.getElementById('visualizer');
     const particleCanvas = document.getElementById('particleCanvas');
     const fireCanvas = document.getElementById('fireCanvas');
+    const fireBlast = document.getElementById('fireBlast');
     const ctxParticle = particleCanvas.getContext('2d');
     const ctxFire = fireCanvas.getContext('2d');
     const speakerLeft = document.getElementById('speakerLeft');
@@ -32,91 +33,122 @@
     let lastLyricText = '';
     let fireIntensity = 0;
     let fireTargetIntensity = 0;
+    let fireExplosionActive = false;
 
     // ============================================================
     // BUILD VISUALIZER
     // ============================================================
-    const NUM_BARS = 30;
+    const NUM_BARS = 25;
     for (let i = 0; i < NUM_BARS; i++) {
         const bar = document.createElement('div');
         bar.className = 'bar';
-        bar.style.height = (5 + Math.random() * 15) + 'px';
+        bar.style.height = (3 + Math.random() * 10) + 'px';
         visualizer.appendChild(bar);
     }
     const bars = document.querySelectorAll('.bar');
 
     // ============================================================
-    // FIRE PARTICLES SYSTEM (🔥 EPIC FIRE!)
+    // FIRE PARTICLES - BIGGER EXPLOSION! 🔥
     // ============================================================
     let fireParticles = [];
-    const MAX_FIRE_PARTICLES = 200;
+    const MAX_FIRE_PARTICLES = 500;
 
     class FireParticle {
-        constructor(x, y, intensity) {
+        constructor(x, y, intensity, isExplosion = false) {
+            const power = isExplosion ? intensity * 2.5 : intensity;
             this.x = x || Math.random() * fireCanvas.width;
-            this.y = y || fireCanvas.height * (0.6 + Math.random() * 0.4);
-            this.size = 3 + Math.random() * 8 * intensity;
-            this.speedX = (Math.random() - 0.5) * 2 * intensity;
-            this.speedY = -(2 + Math.random() * 5) * intensity;
+            this.y = y || fireCanvas.height * (0.5 + Math.random() * 0.5);
+            this.size = 3 + Math.random() * 12 * power;
+            const spread = isExplosion ? 4 : 1.5;
+            this.speedX = (Math.random() - 0.5) * 6 * power * spread;
+            this.speedY = -(2 + Math.random() * 8) * power;
             this.life = 1;
-            this.maxLife = 30 + Math.random() * 60 * intensity;
-            this.hue = 20 + Math.random() * 30; // 20-50 (orange-red)
+            this.maxLife = (20 + Math.random() * 80) * power;
+            this.hue = 10 + Math.random() * 40;
             this.saturation = 100;
-            this.lightness = 50 + Math.random() * 30;
-            this.opacity = 0.5 + Math.random() * 0.5;
+            this.lightness = 50 + Math.random() * 40;
+            this.opacity = 0.6 + Math.random() * 0.4;
+            this.isExplosion = isExplosion;
+            this.gravity = isExplosion ? -0.08 : -0.03;
         }
 
         update() {
-            this.x += this.speedX + (Math.random() - 0.5) * 1.5;
+            this.x += this.speedX + (Math.random() - 0.5) * 2;
             this.y += this.speedY;
-            this.speedY -= 0.05 * (1 + this.life / this.maxLife);
+            this.speedY += this.gravity;
+            this.speedX *= 0.99;
             this.life++;
-            this.opacity = (1 - this.life / this.maxLife) * 0.8;
-            this.size *= 0.98;
-            this.lightness = 50 + 30 * (1 - this.life / this.maxLife);
-            return this.life < this.maxLife && this.y > -50;
+            this.opacity = (1 - this.life / this.maxLife) * 0.9;
+            this.size *= 0.99;
+            this.lightness = 50 + 40 * (1 - this.life / this.maxLife);
+            this.hue += 0.5;
+            return this.life < this.maxLife && this.y > -50 && this.y < fireCanvas.height + 50;
         }
 
         draw(ctx) {
             const alpha = this.opacity * (1 - this.life / this.maxLife);
+            const size = this.size * (1 + 0.5 * (1 - this.life / this.maxLife));
             ctx.beginPath();
-            ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+            ctx.arc(this.x, this.y, size, 0, Math.PI * 2);
             ctx.fillStyle = `hsla(${this.hue}, ${this.saturation}%, ${this.lightness}%, ${alpha})`;
             ctx.fill();
             
-            // Glow
-            ctx.shadowColor = `hsla(${this.hue}, 100%, 50%, ${alpha * 0.5})`;
-            ctx.shadowBlur = 20;
-            ctx.fill();
-            ctx.shadowBlur = 0;
+            // GLOW
+            if (this.isExplosion) {
+                ctx.shadowColor = `hsla(${this.hue}, 100%, 50%, ${alpha * 0.8})`;
+                ctx.shadowBlur = 40;
+                ctx.fill();
+                ctx.shadowBlur = 0;
+            }
         }
     }
 
-    function spawnFire(intensity) {
-        const numSparks = Math.floor(10 + 40 * intensity);
+    function spawnFire(intensity, isExplosion = false) {
+        const numSparks = isExplosion 
+            ? Math.floor(80 + 120 * intensity)  // BIG EXPLOSION!
+            : Math.floor(15 + 40 * intensity);
+        
         const width = fireCanvas.width;
         const height = fireCanvas.height;
         
-        // Spawn from speakers and bottom area
-        for (let i = 0; i < numSparks; i++) {
-            const side = Math.random() < 0.5 ? 'left' : 'right';
-            const x = side === 'left' 
-                ? 50 + Math.random() * 80 
-                : width - 50 - Math.random() * 80;
-            const y = height * (0.7 + Math.random() * 0.3);
-            fireParticles.push(new FireParticle(
-                x + (Math.random() - 0.5) * 40,
-                y,
-                intensity
-            ));
+        // Spawn from speakers with BIG blast
+        const speakerPositions = [
+            { x: 60, y: height * 0.65 },
+            { x: width - 60, y: height * 0.65 }
+        ];
+        
+        for (let pos of speakerPositions) {
+            for (let i = 0; i < numSparks * 0.5; i++) {
+                const offsetX = (Math.random() - 0.5) * (isExplosion ? 80 : 40);
+                const offsetY = (Math.random() - 0.5) * (isExplosion ? 60 : 30);
+                fireParticles.push(new FireParticle(
+                    pos.x + offsetX,
+                    pos.y + offsetY,
+                    intensity,
+                    isExplosion
+                ));
+            }
         }
         
-        // Also spawn from bottom randomly
-        for (let i = 0; i < numSparks * 0.5; i++) {
+        // Extra explosion particles spread wider
+        if (isExplosion) {
+            for (let i = 0; i < numSparks * 0.3; i++) {
+                fireParticles.push(new FireParticle(
+                    Math.random() * width,
+                    height * (0.5 + Math.random() * 0.4),
+                    intensity * 1.2,
+                    true
+                ));
+            }
+        }
+        
+        // Bottom fire
+        for (let i = 0; i < numSparks * 0.3; i++) {
             fireParticles.push(new FireParticle(
                 Math.random() * width,
-                height * (0.8 + Math.random() * 0.2),
-                intensity * 0.7
+                height * (0.85 + Math.random() * 0.15),
+                intensity * 0.7,
+                false
             ));
         }
 
@@ -127,30 +159,33 @@
     }
 
     function updateFire() {
-        // Smooth intensity transition
-        fireIntensity += (fireTargetIntensity - fireIntensity) * 0.05;
+        // Smooth intensity
+        fireIntensity += (fireTargetIntensity - fireIntensity) * 0.08;
         
-        // Clear canvas with fade
         ctxFire.clearRect(0, 0, fireCanvas.width, fireCanvas.height);
         
         if (fireIntensity > 0.01) {
-            // Spawn new fire particles
-            spawnFire(fireIntensity);
+            const isExplosion = fireIntensity > 0.7;
+            spawnFire(fireIntensity, isExplosion);
             
-            // Update and draw existing particles
             fireParticles = fireParticles.filter(p => p.update());
             fireParticles.forEach(p => p.draw(ctxFire));
             
-            // Show fire canvas
             fireCanvas.classList.add('active');
-            
-            // Make speakers glow
             speakerLeft.classList.add('fire');
             speakerRight.classList.add('fire');
+            
+            // Fire blast overlay
+            if (isExplosion) {
+                fireBlast.classList.add('active');
+            } else {
+                fireBlast.classList.remove('active');
+            }
         } else {
             fireCanvas.classList.remove('active');
             speakerLeft.classList.remove('fire');
             speakerRight.classList.remove('fire');
+            fireBlast.classList.remove('active');
             fireParticles = [];
         }
     }
@@ -175,10 +210,10 @@
         reset() {
             this.x = Math.random() * particleCanvas.width;
             this.y = Math.random() * particleCanvas.height;
-            this.size = 1 + Math.random() * 3;
-            this.speedX = (Math.random() - 0.5) * 0.4;
-            this.speedY = -0.2 - Math.random() * 0.5;
-            this.opacity = 0.2 + Math.random() * 0.4;
+            this.size = 1 + Math.random() * 2.5;
+            this.speedX = (Math.random() - 0.5) * 0.3;
+            this.speedY = -0.1 - Math.random() * 0.3;
+            this.opacity = 0.1 + Math.random() * 0.2;
             this.color = `hsla(${40 + Math.random() * 20}, 100%, ${60 + Math.random() * 30}%, ${this.opacity})`;
             this.life = 0;
             this.maxLife = 150 + Math.random() * 200;
@@ -202,7 +237,7 @@
 
     function initParticles() {
         particles = [];
-        for (let i = 0; i < 80; i++) {
+        for (let i = 0; i < 60; i++) {
             const p = new Particle();
             p.y = Math.random() * particleCanvas.height;
             particles.push(p);
@@ -254,7 +289,10 @@
                 const minutes = parseInt(match[1]);
                 const seconds = parseInt(match[2]);
                 const centiseconds = parseInt(match[3]);
-                const time = minutes * 60 + seconds + centiseconds / 100;
+                let time = minutes * 60 + seconds + centiseconds / 100;
+                // REDUCE TIMESTAMP BY 1 SECOND
+                time = time - 1.0;
+                if (time < 0) time = 0;
                 const textContent = line.replace(timeRegex, '').trim();
                 if (textContent) {
                     result.push({ time, text: textContent });
@@ -268,62 +306,62 @@
 
     function useFallbackLyrics() {
         const fallback = [
-            { time: 5, text: 'Honour The Son uhn' },
-            { time: 14, text: 'Oseneblanabame…' },
-            { time: 16, text: 'Abanabame…' },
-            { time: 18, text: 'Abanabame' },
-            { time: 20, text: 'Abanabame.' },
-            { time: 22, text: 'Oseneblanabame…' },
-            { time: 24, text: 'Abanabame…' },
-            { time: 26, text: 'Abanabame' },
-            { time: 29, text: 'Abanabame.' },
-            { time: 31, text: 'Oseneblanabame' },
-            { time: 33, text: 'Nobi collect I come collect' },
-            { time: 35, text: 'I come shout alleluia' },
-            { time: 37, text: 'Aba naba me' },
-            { time: 39, text: 'Be ne san re gba ba hion' },
-            { time: 41, text: 'Be ne Esan re gbabonelimi' },
-            { time: 44, text: 'I come shout alleluia' },
-            { time: 46, text: 'To Aba naba me' },
-            { time: 49, text: 'Anything You do for us today oh' },
-            { time: 53, text: 'Anhan anhan ahan han' },
-            { time: 56, text: 'Na bonus ooo' },
-            { time: 58, text: 'Anhan anhan ahan han' },
-            { time: 63, text: 'Na bonus oo' },
-            { time: 65, text: 'Baba me, I know say' },
-            { time: 67, text: 'Even though we ask for nothing' },
-            { time: 70, text: 'Say You go must do something when!' },
-            { time: 72, text: 'Abanabame' },
-            { time: 73, text: 'Because when praises go up' },
-            { time: 76, text: 'Your blessings must come down' },
-            { time: 78, text: 'So we come shout alleluia when!' },
-            { time: 80, text: 'Abanabame' },
-            { time: 83, text: 'Anything You do for us today oh' },
-            { time: 87, text: 'Anhan anhan ahan han' },
-            { time: 89, text: 'Na bonus ooo' },
-            { time: 92, text: 'Anhan anhan ahan han' },
-            { time: 98, text: 'Na bonus oo' },
-            { time: 105, text: 'Oseneblanabame…' },
-            { time: 107, text: 'Abanabame…' },
-            { time: 109, text: 'Abanabame…' },
-            { time: 111, text: 'Abanabame…' },
-            { time: 113, text: 'Oseneblanabame…' },
-            { time: 115, text: 'Abanabame…' },
-            { time: 118, text: 'Abanabame…' },
-            { time: 120, text: 'Alleluia…' },
-            { time: 120.5, text: 'Alleluia…' },
-            { time: 124, text: 'Anything You do for us today oh' },
-            { time: 128, text: 'Anhan anhan ahan han' },
-            { time: 130, text: 'Na bonus ooo' },
-            { time: 133, text: 'Anhan anhan ahan han' },
-            { time: 139, text: 'Na bonus oo' },
-            { time: 141, text: 'Abanabame…' },
+            { time: 4, text: 'Honour The Son uhn' },
+            { time: 13, text: 'Oseneblanabame…' },
+            { time: 15, text: 'Abanabame…' },
+            { time: 17, text: 'Abanabame' },
+            { time: 19, text: 'Abanabame.' },
+            { time: 21, text: 'Oseneblanabame…' },
+            { time: 23, text: 'Abanabame…' },
+            { time: 25, text: 'Abanabame' },
+            { time: 28, text: 'Abanabame.' },
+            { time: 30, text: 'Oseneblanabame' },
+            { time: 32, text: 'Nobi collect I come collect' },
+            { time: 34, text: 'I come shout alleluia' },
+            { time: 36, text: 'Aba naba me' },
+            { time: 38, text: 'Be ne san re gba ba hion' },
+            { time: 40, text: 'Be ne Esan re gbabonelimi' },
+            { time: 43, text: 'I come shout alleluia' },
+            { time: 45, text: 'To Aba naba me' },
+            { time: 48, text: 'Anything You do for us today oh' },
+            { time: 52, text: 'Anhan anhan ahan han' },
+            { time: 55, text: 'Na bonus ooo' },
+            { time: 57, text: 'Anhan anhan ahan han' },
+            { time: 62, text: 'Na bonus oo' },
+            { time: 64, text: 'Baba me, I know say' },
+            { time: 66, text: 'Even though we ask for nothing' },
+            { time: 69, text: 'Say You go must do something when!' },
+            { time: 71, text: 'Abanabame' },
+            { time: 72, text: 'Because when praises go up' },
+            { time: 75, text: 'Your blessings must come down' },
+            { time: 77, text: 'So we come shout alleluia when!' },
+            { time: 79, text: 'Abanabame' },
+            { time: 82, text: 'Anything You do for us today oh' },
+            { time: 86, text: 'Anhan anhan ahan han' },
+            { time: 88, text: 'Na bonus ooo' },
+            { time: 91, text: 'Anhan anhan ahan han' },
+            { time: 97, text: 'Na bonus oo' },
+            { time: 104, text: 'Oseneblanabame…' },
+            { time: 106, text: 'Abanabame…' },
+            { time: 108, text: 'Abanabame…' },
+            { time: 110, text: 'Abanabame…' },
+            { time: 112, text: 'Oseneblanabame…' },
+            { time: 114, text: 'Abanabame…' },
+            { time: 117, text: 'Abanabame…' },
+            { time: 119, text: 'Alleluia…' },
+            { time: 119.5, text: 'Alleluia…' },
+            { time: 123, text: 'Anything You do for us today oh' },
+            { time: 127, text: 'Anhan anhan ahan han' },
+            { time: 129, text: 'Na bonus ooo' },
+            { time: 132, text: 'Anhan anhan ahan han' },
+            { time: 138, text: 'Na bonus oo' },
+            { time: 140, text: 'Abanabame…' },
+            { time: 143, text: 'Abanabame…' },
             { time: 144, text: 'Abanabame…' },
-            { time: 145, text: 'Abanabame…' },
-            { time: 148, text: 'Oseneblanabame…' },
-            { time: 150, text: 'Abanabame…' },
-            { time: 152, text: 'Abanabame…' },
-            { time: 154, text: 'Alleluia…' }
+            { time: 147, text: 'Oseneblanabame…' },
+            { time: 149, text: 'Abanabame…' },
+            { time: 151, text: 'Abanabame…' },
+            { time: 153, text: 'Alleluia…' }
         ];
         lyrics = fallback;
         lyricDisplay.innerHTML = '🎵 <span class="highlight">Honour The Son uhn</span>';
@@ -343,17 +381,25 @@
     }
 
     // ============================================================
-    // CHECK FOR FIRE TRIGGERS (🔥 "Na bonus" = FIRE!)
+    // CHECK FOR FIRE TRIGGERS - BIGGER EXPLOSION!
     // ============================================================
     function checkFireTriggers(text) {
         const lower = text.toLowerCase();
-        // Trigger fire on "Na bonus" and "alleluia"
-        if (lower.includes('na bonus') || lower.includes('alleluia')) {
-            fireTargetIntensity = 1.0;
-        } else if (lower.includes('abanabame') || lower.includes('oseneblanabame')) {
+        if (lower.includes('na bonus')) {
+            fireTargetIntensity = 1.0;  // FULL FIRE EXPLOSION!
+            fireExplosionActive = true;
+        } else if (lower.includes('alleluia')) {
+            fireTargetIntensity = 0.9;
+            fireExplosionActive = true;
+        } else if (lower.includes('abanabame')) {
+            fireTargetIntensity = 0.5;
+            fireExplosionActive = false;
+        } else if (lower.includes('oseneblanabame')) {
             fireTargetIntensity = 0.4;
+            fireExplosionActive = false;
         } else {
-            fireTargetIntensity = 0.1;
+            fireTargetIntensity = 0.05;
+            fireExplosionActive = false;
         }
     }
 
@@ -382,7 +428,6 @@
             currentLyricIndex = foundIndex;
             const lyric = lyrics[foundIndex];
             setLyric(lyric, foundIndex);
-            // Check if this lyric triggers fire
             checkFireTriggers(lyric.text);
         }
     }
@@ -398,13 +443,12 @@
         
         setTimeout(() => {
             let displayText = newText;
-            if (displayText.toLowerCase().includes('alleluia')) {
-                displayText = displayText.replace(/alleluia/gi, '<span class="highlight">alleluia</span>');
-            }
-            if (displayText.includes('Na bonus')) {
-                displayText = displayText.replace(/Na bonus/g, '<span class="highlight">Na bonus</span>');
-            }
+            // HIGHLIGHT all important words
+            displayText = displayText.replace(/alleluia/gi, '<span class="highlight">alleluia</span>');
+            displayText = displayText.replace(/Na bonus/g, '<span class="highlight">Na bonus</span>');
             displayText = displayText.replace(/(bonus o+)/gi, '<span class="highlight">$1</span>');
+            displayText = displayText.replace(/Abanabame/g, '<span class="highlight">Abanabame</span>');
+            displayText = displayText.replace(/Oseneblanabame/g, '<span class="highlight">Oseneblanabame</span>');
             
             lyricDisplay.innerHTML = displayText;
             lyricDisplay.classList.remove('anim-out');
@@ -420,17 +464,16 @@
         bars.forEach((bar, i) => {
             const freq = 0.8 + (i / NUM_BARS) * 1.5;
             const phase = (i / NUM_BARS) * Math.PI * 2;
-            const value = 15 + 70 * baseIntensity * (0.5 + 0.5 * Math.sin(time * freq + phase));
-            bar.style.height = Math.max(5, value) + 'px';
+            const value = 5 + 50 * baseIntensity * (0.5 + 0.5 * Math.sin(time * freq + phase));
+            bar.style.height = Math.max(3, value) + 'px';
             
-            // Fire colors when intensity is high
-            const brightness = 50 + 40 * baseIntensity;
+            const brightness = 40 + 50 * baseIntensity;
             const hue = fireIntensity > 0.5 
-                ? 20 + 20 * Math.sin(time * 0.3 + i * 0.1)  // Fire colors
-                : 40 + 10 * Math.sin(time * 0.3 + i * 0.1); // Gold colors
+                ? 15 + 25 * Math.sin(time * 0.3 + i * 0.1)
+                : 40 + 15 * Math.sin(time * 0.3 + i * 0.1);
             
             bar.style.background = `linear-gradient(to top, 
-                hsl(${hue}, 100%, ${brightness - 20}%), 
+                hsl(${hue}, 100%, ${brightness - 15}%), 
                 hsl(${hue + 10}, 100%, ${brightness + 10}%))`;
         });
     }
@@ -454,11 +497,11 @@
         timestampEl.textContent = `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
 
         const intensity = audioLoaded && !audioPlayer.paused 
-            ? 0.8 + 0.2 * Math.sin(currentTime * 0.5) 
-            : 0.3;
+            ? 0.7 + 0.3 * Math.sin(currentTime * 0.5) 
+            : 0.2;
         updateVisualizer(currentTime, intensity);
 
-        // Update fire effects
+        // UPDATE FIRE
         updateFire();
 
         if (audioLoaded && !audioPlayer.paused) {
@@ -543,12 +586,13 @@
             lyricDisplay.classList.add('show');
         }, 100);
         bars.forEach(bar => {
-            bar.style.height = '10px';
+            bar.style.height = '5px';
         });
         playBtn.textContent = '▶ PLAY';
         fireCanvas.classList.remove('active');
         speakerLeft.classList.remove('fire');
         speakerRight.classList.remove('fire');
+        fireBlast.classList.remove('active');
     }
 
     function toggleFullscreen() {
@@ -608,8 +652,9 @@
     statusText.textContent = '⏹ PRESS PLAY or SPACE';
     
     console.log('🔥 ABANABAME - Silas Ibhadode');
-    console.log('🔥 FIRE EFFECTS ACTIVE!');
-    console.log('📁 Files: index.html + style.css + player.js + abanabame2.lrc + abanabame2.mp3');
+    console.log('🔥 BIG FIRE EXPLOSION READY!');
+    console.log('📱 PORTRAIT MODE OPTIMIZED');
+    console.log('⏱ Timestamps reduced by 1 second');
     console.log('🎮 SPACE=play/pause, R=reset, F=fullscreen');
-    console.log('🔥 "Na bonus" = FIRE EXPLOSION!');
+    console.log('🔥 "Na bonus" = HUGE FIRE EXPLOSION from speakers!');
 })();
