@@ -18,7 +18,7 @@
             justify-content: center;
             align-items: center;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            padding: 20px;
+            padding: 5px;
         }
 
         /* Particle background */
@@ -41,7 +41,7 @@
             backdrop-filter: blur(25px);
             -webkit-backdrop-filter: blur(25px);
             border-radius: 40px;
-            padding: 35px 30px 30px;
+            padding: 15px 20px;
             box-shadow: 
                 0 40px 80px rgba(0, 0, 0, 0.9),
                 0 0 0 1px rgba(255, 200, 120, 0.08),
@@ -221,6 +221,24 @@
         @keyframes photoFloat {
             0% { transform: translateY(0px); }
             100% { transform: translateY(-12px); }
+        }
+        
+        /* ===== MAIN PHOTO ===== */
+
+        .main-photo {
+           width: 100%;
+           margin: 20px 0 25px;
+           border-radius: 25px;
+           overflow: hidden;
+           box-shadow: 0 15px 40px rgba(0,0,0,0.6);
+         border: 2px solid rgba(255,200,120,0.15);
+       }
+
+       .main-photo img {
+            width: 100%;
+            height: auto;
+            display: block;
+            object-fit: cover;
         }
 
         /* ===== LYRIC DISPLAY ===== */
@@ -436,6 +454,20 @@
             .play-btn { width: 42px; height: 42px; font-size: 1.1rem; }
             .time-display { font-size: 0.7rem; min-width: 60px; }
         }
+        
+        .main-photo img {
+           animation: beatPhoto 0.8s infinite ease-in-out;
+        }
+
+@keyframes beatPhoto {
+    0%,100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.04);
+    }
+}
+        
     </style>
 </head>
 <body>
@@ -459,14 +491,10 @@
         </div>
     </div>
 
-    <!-- PHOTO STRIP -->
-    <div class="photo-strip">
-        <div class="photo-frame"><img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop&crop=face" alt="photo 1"></div>
-        <div class="photo-frame"><img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=200&h=200&fit=crop&crop=face" alt="photo 2"></div>
-        <div class="photo-frame"><img src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=200&h=200&fit=crop&crop=face" alt="photo 3"></div>
-        <div class="photo-frame"><img src="https://images.unsplash.com/photo-1489424731084-a5d8b219a5bb?w=200&h=200&fit=crop&crop=face" alt="photo 4"></div>
-        <div class="photo-frame"><img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop&crop=face" alt="photo 5"></div>
-    </div>
+    <!-- MAIN PHOTO -->
+<div class="main-photo">
+    <img src="choir.png" alt="Silas Ibhadode and Choir">
+</div>
 
     <!-- LYRICS -->
     <div class="lyric-box">
