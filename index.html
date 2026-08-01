@@ -620,7 +620,7 @@
     </div>
 
     <div class="main-photo">
-      <img src="choir.png" alt="Silas Ibhadode and Choir">
+      <img src="choir.png" alt="Silas Ibhadode and Choir" loading="lazy">
     </div>
 
     <div class="lyric-box">
@@ -639,7 +639,7 @@
 
     <!-- DONATION SECTION -->
     <div class="donation-section">
-      <h3>❤️ <span>Support Abanabame</span></h3>
+      <h3 id="donationMessage">❤️ <span>Support Abanabame</span></h3>
       <div class="donation-amounts" id="donationAmounts">
         <button data-amount="1000">₦1000</button>
         <button data-amount="5000">₦5000</button>
@@ -666,18 +666,12 @@
 
   <script>
     (function() {
-      // ============================================
-      // CONFIGURATION - CHANGE THESE VALUES
-      // ============================================
-      const CONFIG = {
-  backendUrl: 'https://abanabame-backend.onrender.com/api/donate'
+     // ✅ NEW CONFIG with all endpoints
+const CONFIG = {
+  backendUrl: 'https://abanabame-backend.onrender.com/api/donate',
+  checkUnlockUrl: 'https://abanabame-backend.onrender.com/api/check-unlock',
+  verifyPaymentUrl: 'https://abanabame-backend.onrender.com/api/verify-payment'
 };
-        
-        // Optional: Your Paystack public key (if needed for client-side)
-        paystackPublicKey: 'pk_live_xxxxxxxxxxxxxxxx'
-      };
-
-      // ============================================
       // 1. PARTICLES
       // ============================================
       const canvas = document.getElementById('particleCanvas');
@@ -925,121 +919,251 @@
 
       setTimeout(updateTimeDisplay, 100);
 
-      // ============================================
-      // 4. DONATION - REAL PAYSTACK INTEGRATION
-      // ============================================
-      const donateBtn = document.getElementById('donateBtn');
-      const donateStatus = document.getElementById('donateStatus');
-      const customAmountInput = document.getElementById('customAmount');
-      const donorEmailInput = document.getElementById('donorEmail');
-      const amountButtons = document.querySelectorAll('#donationAmounts button');
+     // ============================================
+// 4. DONATION WITH PERMANENT UNLOCK
+// ============================================
+const donateBtn = document.getElementById('donateBtn');
+const donateStatus = document.getElementById('donateStatus');
+const customAmountInput = document.getElementById('customAmount');
+const donorEmailInput = document.getElementById('donorEmail');
+const amountButtons = document.querySelectorAll('#donationAmounts button');
 
-      let selectedAmount = 200;
+let selectedAmount = 2000;
+let donationUnlocked = false;
+let currentEmail = '';
 
-      function setActiveButton(btn) {
-        amountButtons.forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-      }
-
-      amountButtons.forEach(btn => {
-        btn.addEventListener('click', function() {
-          const val = this.dataset.amount;
-          if (val === 'custom') {
-            setActiveButton(this);
-            customAmountInput.disabled = false;
-            customAmountInput.focus();
-            selectedAmount = parseInt(customAmountInput.value) || 200;
-          } else {
-            setActiveButton(this);
-            customAmountInput.disabled = true;
-            selectedAmount = parseInt(val);
-            customAmountInput.value = val;
-          }
-        });
+// ============================================
+// CHECK UNLOCK STATUS ON PAGE LOAD
+// ============================================
+async function checkUnlockStatus() {
+  // Check if email is stored in localStorage
+  const savedEmail = localStorage.getItem('abanabame_email');
+  if (savedEmail) {
+    donorEmailInput.value = savedEmail;
+    currentEmail = savedEmail;
+    
+    try {
+      const response = await fetch(CONFIG.checkUnlockUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: savedEmail })
       });
-
-      customAmountInput.addEventListener('input', function() {
-        const val = parseInt(this.value);
-        if (!isNaN(val) && val > 0) {
-          selectedAmount = val;
-          amountButtons.forEach(b => b.classList.remove('active'));
-          const customBtn = document.querySelector('#donationAmounts button[data-amount="custom"]');
-          if (customBtn) customBtn.classList.add('active');
-          customAmountInput.disabled = false;
-        }
-      });
-
-      // 🔥 REAL DONATION WITH PAYSTACK
-      donateBtn.addEventListener('click', async function() {
-        const amount = selectedAmount;
-        const email = donorEmailInput.value.trim();
-
-        // Validate
-        if (!amount || amount < 50) {
-          donateStatus.textContent = '⚠️ Please enter a valid amount (min ₦50)';
-          return;
-        }
-
-        if (!email || !email.includes('@')) {
-          donateStatus.textContent = '⚠️ Please enter a valid email address';
-          donorEmailInput.focus();
-          return;
-        }
-
-        donateStatus.textContent = '⏳ Initiating payment...';
+      
+      const data = await response.json();
+      
+      if (data.unlocked) {
+        donationUnlocked = true;
+        document.getElementById('donationMessage').innerHTML = 
+          '✅ <span>You have permanent access to Abanabame!</span>';
+        document.getElementById('donateStatus').textContent = 
+          '🎵 Thank you for your support! The full song is unlocked.';
+        document.getElementById('donateStatus').style.color = '#4ade80';
+        donateBtn.textContent = '✅ Already Unlocked';
         donateBtn.disabled = true;
-
-        try {
-          // Call your Render backend
-          const response = await fetch(CONFIG.backendUrl, {
-            method: 'POST',
-            headers: { 
-              'Content-Type': 'application/json',
-              'Accept': 'application/json'
-            },
-            body: JSON.stringify({
-              amount: amount,
-              email: email,
-              callback_url: window.location.href.split('?')[0] + '?payment=success'
-            })
-          });
-
-          const data = await response.json();
-
-          if (data.success && data.authorization_url) {
-            donateStatus.textContent = '🔄 Redirecting to Paystack...';
-            // Redirect to Paystack payment page
-            window.location.href = data.authorization_url;
-          } else {
-            donateStatus.textContent = '❌ Error: ' + (data.error || 'Could not initiate payment');
-            donateBtn.disabled = false;
-          }
-
-        } catch (err) {
-          donateStatus.textContent = '❌ Network error. Please try again.';
-          donateBtn.disabled = false;
-          console.error('Donation error:', err);
+        donateBtn.style.opacity = '0.6';
+        
+        // Auto-play if previously unlocked
+        if (audio.paused) {
+          audio.play();
+          playBtn.textContent = '⏸';
+          playBtn.classList.add('playing');
+          vinylRecord.classList.add('playing');
         }
+      }
+    } catch (error) {
+      console.log('Check unlock error:', error);
+    }
+  }
+}
+
+// Call on page load
+checkUnlockStatus();
+
+// ============================================
+// DONATION AMOUNT SELECTION
+// ============================================
+function setActiveButton(btn) {
+  amountButtons.forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+}
+
+amountButtons.forEach(btn => {
+  btn.addEventListener('click', function() {
+    const val = this.dataset.amount;
+    if (val === 'custom') {
+      setActiveButton(this);
+      customAmountInput.disabled = false;
+      customAmountInput.focus();
+      selectedAmount = parseInt(customAmountInput.value) || 2000;
+    } else {
+      setActiveButton(this);
+      customAmountInput.disabled = true;
+      selectedAmount = parseInt(val);
+      customAmountInput.value = val;
+    }
+  });
+});
+
+customAmountInput.addEventListener('input', function() {
+  const val = parseInt(this.value);
+  if (!isNaN(val) && val > 0) {
+    selectedAmount = val;
+    amountButtons.forEach(b => b.classList.remove('active'));
+    const customBtn = document.querySelector('#donationAmounts button[data-amount="custom"]');
+    if (customBtn) customBtn.classList.add('active');
+    customAmountInput.disabled = false;
+  }
+});
+
+// ============================================
+// DONATE BUTTON
+// ============================================
+donateBtn.addEventListener('click', async function() {
+  if (donationUnlocked) {
+    donateStatus.textContent = '✅ You already have permanent access!';
+    return;
+  }
+
+  const amount = selectedAmount;
+  const email = donorEmailInput.value.trim();
+
+  if (!amount || amount < 50) {
+    donateStatus.textContent = '⚠️ Please enter a valid amount (min ₦50)';
+    return;
+  }
+
+  if (!email || !email.includes('@')) {
+    donateStatus.textContent = '⚠️ Please enter a valid email address';
+    donorEmailInput.focus();
+    return;
+  }
+
+  // Save email for next visit
+  localStorage.setItem('abanabame_email', email);
+  currentEmail = email;
+
+  donateStatus.textContent = '⏳ Initiating payment...';
+  donateBtn.disabled = true;
+
+  try {
+    const response = await fetch(CONFIG.backendUrl, {
+      method: 'POST',
+      headers: { 
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      },
+      body: JSON.stringify({
+        amount: amount,
+        email: email,
+        callback_url: window.location.href.split('?')[0] + '?reference={{reference}}'
+      })
+    });
+
+    const data = await response.json();
+
+    if (data.success && data.authorization_url) {
+      donateStatus.textContent = '🔄 Redirecting to Paystack...';
+      window.location.href = data.authorization_url;
+    } else {
+      donateStatus.textContent = '❌ Error: ' + (data.error || 'Could not initiate payment');
+      donateBtn.disabled = false;
+    }
+
+  } catch (err) {
+    donateStatus.textContent = '❌ Network error. Please try again.';
+    donateBtn.disabled = false;
+    console.error('Donation error:', err);
+  }
+});
+
+// ============================================
+// VERIFY PAYMENT ON RETURN
+// ============================================
+async function verifyPayment() {
+  const urlParams = new URLSearchParams(window.location.search);
+  const reference = urlParams.get('reference');
+  const paymentSuccess = urlParams.get('payment');
+
+  if (reference) {
+    try {
+      const response = await fetch(CONFIG.verifyPaymentUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ reference: reference })
       });
-
-      // Check if returning from successful payment
-      if (window.location.search.includes('payment=success')) {
-        donateStatus.textContent = '🎉 Thank you for your generous support! God bless you!';
-        donateStatus.style.color = '#f5c88a';
+      
+      const data = await response.json();
+      
+      if (data.verified) {
+        donationUnlocked = true;
+        localStorage.setItem('abanabame_email', data.email);
+        document.getElementById('donationMessage').innerHTML = 
+          '✅ <span>Permanent Access Unlocked!</span>';
+        document.getElementById('donateStatus').textContent = 
+          '🎉 Thank you! You now have permanent access to Abanabame.';
+        document.getElementById('donateStatus').style.color = '#4ade80';
+        donateBtn.textContent = '✅ Unlocked';
+        donateBtn.disabled = true;
+        donateBtn.style.opacity = '0.6';
+        
+        // Play the full song
+        audio.play();
+        playBtn.textContent = '⏸';
+        playBtn.classList.add('playing');
+        vinylRecord.classList.add('playing');
+        
+        // Remove reference from URL
+        window.history.replaceState({}, document.title, window.location.pathname);
+      } else {
+        donateStatus.textContent = '⚠️ Payment verification failed. Please contact support.';
       }
+    } catch (error) {
+      console.error('Verification error:', error);
+      donateStatus.textContent = '❌ Error verifying payment. Please contact support.';
+    }
+  }
+}
 
-      // Set default active
-      const defaultCustomBtn = document.querySelector('#donationAmounts button[data-amount="custom"]');
-      if (defaultCustomBtn) {
-        setActiveButton(defaultCustomBtn);
-        customAmountInput.disabled = false;
-        customAmountInput.value = Custom;
-        selectedAmount = Custom;
-      }
+// Check for payment verification on load
+verifyPayment();
 
-      console.log('🎵 Abanabame player + Donation ready!');
-      console.log(`📍 Backend URL: ${CONFIG.backendUrl}`);
-      console.log('🔑 Paystack secret key is stored securely on the backend.');
+// ============================================
+// 30-SECOND PREVIEW
+// ============================================
+audio.addEventListener('timeupdate', () => {
+  if (audio.currentTime >= 30 && !donationUnlocked) {
+    audio.pause();
+    playBtn.textContent = '▶';
+    playBtn.classList.remove('playing');
+    vinylRecord.classList.remove('playing');
+
+    document.querySelector('.donation-section').scrollIntoView({
+      behavior: 'smooth'
+    });
+
+    document.getElementById('donationMessage').innerHTML =
+      '❤️ <span>30 seconds preview complete. Support Abanabame to continue listening.</span>';
+
+    document.getElementById('donateStatus').textContent =
+      '🎵 Donate once to unlock the full song forever!';
+  }
+});
+
+// ============================================
+// INITIAL SETUP
+// ============================================
+const defaultCustomBtn = document.querySelector('#donationAmounts button[data-amount="custom"]');
+if (defaultCustomBtn) {
+  setActiveButton(defaultCustomBtn);
+  customAmountInput.disabled = false;
+  customAmountInput.value = 2000;
+  selectedAmount = 2000;
+}
+
+console.log('🎵 Abanabame with Permanent Unlock!');
+console.log(`📍 Backend URL: ${CONFIG.backendUrl}`);
+console.log(`🔍 Check Unlock URL: ${CONFIG.checkUnlockUrl}`);
+console.log(`✅ Verify Payment URL: ${CONFIG.verifyPaymentUrl}`);
     })();
   </script>
 
