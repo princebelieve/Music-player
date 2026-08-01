@@ -3,8 +3,48 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <!-- ============================================ -->
+  <!-- WHATSAPP / SOCIAL MEDIA PREVIEW META TAGS    -->
+  <!-- ============================================ -->
   <title>Abanabame · Silas Ibhadode</title>
+  
+  <!-- Primary Meta Tags -->
+  <meta property="og:title" content="Abanabame by Silas Ibhadode" />
+  <meta property="og:description" content="Listen to Abanabame - a soulful worship song by Silas Ibhadode. Support the ministry with a donation and unlock the full song forever ❤️" />
+  <meta property="og:type" content="music.song" />
+  <meta property="og:url" content="https://abanabame.globalcreest.com" />
+  
+  <!-- 🔥 IMPORTANT: Using your logo.png from the same folder -->
+  <meta property="og:image" content="https://abanabame.globalcreest.com/logo.png" />
+  
+  <!-- WhatsApp specific dimensions -->
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:image:type" content="image/png" />
+  
+  <!-- Twitter Card (for better sharing) -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Abanabame by Silas Ibhadode" />
+  <meta name="twitter:description" content="Listen to Abanabame - a soulful worship song by Silas Ibhadode." />
+  <meta name="twitter:image" content="https://abanabame.globalcreest.com/logo.png" />
+  
+  <!-- Additional WhatsApp meta tags -->
+  <meta property="og:site_name" content="Abanabame" />
+  <meta property="og:locale" content="en_US" />
+  
+  <!-- PWA / Capacitor Meta Tags -->
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Abanabame" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <link rel="apple-touch-icon" href="logo.png" />
+  <link rel="icon" type="image/png" href="logo.png" />
+
   <style>
+    /* ============================================ */
+    /* ALL YOUR EXISTING STYLES (KEEP AS IS)        */
+    /* ============================================ */
     * {
       margin: 0;
       padding: 0;
@@ -544,6 +584,58 @@
       min-height: 1.5rem;
     }
 
+    /* ============================================ */
+    /* NEW: SHARE BUTTON STYLES                     */
+    /* ============================================ */
+    .share-section {
+      margin-top: 15px;
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .share-btn {
+      border: none;
+      border-radius: 60px;
+      padding: 10px 24px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: #fff;
+    }
+
+    .share-btn:hover {
+      transform: scale(1.05);
+    }
+
+    .share-btn:active {
+      transform: scale(0.95);
+    }
+
+    .share-whatsapp {
+      background: #25D366;
+      box-shadow: 0 4px 15px rgba(37, 211, 102, 0.3);
+    }
+
+    .share-whatsapp:hover {
+      box-shadow: 0 6px 25px rgba(37, 211, 102, 0.5);
+    }
+
+    .share-copy {
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      color: #b8a88a;
+    }
+
+    .share-copy:hover {
+      background: rgba(255, 255, 255, 0.2);
+    }
+
     @media (max-width: 650px) {
       .player-container {
         padding: 20px;
@@ -584,6 +676,10 @@
       }
       .donation-email input {
         max-width: 100%;
+      }
+      .share-btn {
+        padding: 8px 16px;
+        font-size: 0.85rem;
       }
     }
 
@@ -657,6 +753,18 @@
       
       <button class="donate-btn" id="donateBtn">Donate</button>
       <div class="donate-status" id="donateStatus">💫 your support means the world</div>
+      
+      <!-- ============================================ -->
+      <!-- NEW: SHARE SECTION                          -->
+      <!-- ============================================ -->
+      <div class="share-section">
+        <button class="share-btn share-whatsapp" id="shareWhatsAppBtn">
+          <span>💬</span> Share on WhatsApp
+        </button>
+        <button class="share-btn share-copy" id="copyLinkBtn">
+          <span>📋</span> Copy Link
+        </button>
+      </div>
     </div>
 
     <audio id="audioPlayer" preload="metadata" style="display:none;">
@@ -666,13 +774,18 @@
 
   <script>
     (function() {
-     // ✅ NEW CONFIG with all endpoints
-const CONFIG = {
-  backendUrl: 'https://abanabame-backend.onrender.com/api/donate',
-  checkUnlockUrl: 'https://abanabame-backend.onrender.com/api/check-unlock',
-  verifyPaymentUrl: 'https://abanabame-backend.onrender.com/api/verify-payment'
-};
-      // 1. PARTICLES
+      // ============================================
+      // CONFIGURATION
+      // ============================================
+      const CONFIG = {
+        backendUrl: 'https://abanabame-backend.onrender.com/api/donate',
+        checkUnlockUrl: 'https://abanabame-backend.onrender.com/api/check-unlock',
+        verifyPaymentUrl: 'https://abanabame-backend.onrender.com/api/verify-payment',
+        appUrl: 'https://abanabame.globalcreest.com'
+      };
+
+      // ============================================
+      // 1. PARTICLES (KEEP AS IS)
       // ============================================
       const canvas = document.getElementById('particleCanvas');
       const ctx = canvas.getContext('2d');
@@ -750,7 +863,7 @@ const CONFIG = {
       });
 
       // ============================================
-      // 2. LYRIC ENGINE
+      // 2. LYRIC ENGINE (KEEP AS IS)
       // ============================================
       const lyrics = [
         { time: 5.0, text: 'Honour The Son uhn' },
@@ -842,7 +955,7 @@ const CONFIG = {
       renderLyrics(0);
 
       // ============================================
-      // 3. AUDIO CONTROLS
+      // 3. AUDIO CONTROLS (KEEP AS IS)
       // ============================================
       const playBtn = document.getElementById('playBtn');
       const progressBar = document.getElementById('progressBar');
@@ -919,251 +1032,336 @@ const CONFIG = {
 
       setTimeout(updateTimeDisplay, 100);
 
-     // ============================================
-// 4. DONATION WITH PERMANENT UNLOCK
-// ============================================
-const donateBtn = document.getElementById('donateBtn');
-const donateStatus = document.getElementById('donateStatus');
-const customAmountInput = document.getElementById('customAmount');
-const donorEmailInput = document.getElementById('donorEmail');
-const amountButtons = document.querySelectorAll('#donationAmounts button');
+      // ============================================
+      // 4. DONATION WITH PERMANENT UNLOCK
+      // ============================================
+      const donateBtn = document.getElementById('donateBtn');
+      const donateStatus = document.getElementById('donateStatus');
+      const customAmountInput = document.getElementById('customAmount');
+      const donorEmailInput = document.getElementById('donorEmail');
+      const amountButtons = document.querySelectorAll('#donationAmounts button');
 
-let selectedAmount = 2000;
-let donationUnlocked = false;
-let currentEmail = '';
+      let selectedAmount = 2000;
+      let donationUnlocked = false;
+      let currentEmail = '';
 
-// ============================================
-// CHECK UNLOCK STATUS ON PAGE LOAD
-// ============================================
-async function checkUnlockStatus() {
-  // Check if email is stored in localStorage
-  const savedEmail = localStorage.getItem('abanabame_email');
-  if (savedEmail) {
-    donorEmailInput.value = savedEmail;
-    currentEmail = savedEmail;
-    
-    try {
-      const response = await fetch(CONFIG.checkUnlockUrl, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: savedEmail })
-      });
-      
-      const data = await response.json();
-      
-      if (data.unlocked) {
-        donationUnlocked = true;
-        document.getElementById('donationMessage').innerHTML = 
-          '✅ <span>You have permanent access to Abanabame!</span>';
-        document.getElementById('donateStatus').textContent = 
-          '🎵 Thank you for your support! The full song is unlocked.';
-        document.getElementById('donateStatus').style.color = '#4ade80';
-        donateBtn.textContent = '✅ Already Unlocked';
-        donateBtn.disabled = true;
-        donateBtn.style.opacity = '0.6';
-        
-        // Auto-play if previously unlocked
-        if (audio.paused) {
-          audio.play();
-          playBtn.textContent = '⏸';
-          playBtn.classList.add('playing');
-          vinylRecord.classList.add('playing');
+      // CHECK UNLOCK STATUS ON PAGE LOAD
+      async function checkUnlockStatus() {
+        const savedEmail = localStorage.getItem('abanabame_email');
+        if (savedEmail) {
+          donorEmailInput.value = savedEmail;
+          currentEmail = savedEmail;
+          
+          try {
+            const response = await fetch(CONFIG.checkUnlockUrl, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ email: savedEmail })
+            });
+            
+            const data = await response.json();
+            
+            if (data.unlocked) {
+              donationUnlocked = true;
+              document.getElementById('donationMessage').innerHTML = 
+                '✅ <span>You have permanent access to Abanabame!</span>';
+              document.getElementById('donateStatus').textContent = 
+                '🎵 Thank you for your support! The full song is unlocked.';
+              document.getElementById('donateStatus').style.color = '#4ade80';
+              donateBtn.textContent = '✅ Already Unlocked';
+              donateBtn.disabled = true;
+              donateBtn.style.opacity = '0.6';
+              
+              if (audio.paused) {
+                audio.play();
+                playBtn.textContent = '⏸';
+                playBtn.classList.add('playing');
+                vinylRecord.classList.add('playing');
+              }
+            }
+          } catch (error) {
+            console.log('Check unlock error:', error);
+          }
         }
       }
-    } catch (error) {
-      console.log('Check unlock error:', error);
-    }
-  }
-}
 
-// Call on page load
-checkUnlockStatus();
+      checkUnlockStatus();
 
-// ============================================
-// DONATION AMOUNT SELECTION
-// ============================================
-function setActiveButton(btn) {
-  amountButtons.forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-}
-
-amountButtons.forEach(btn => {
-  btn.addEventListener('click', function() {
-    const val = this.dataset.amount;
-    if (val === 'custom') {
-      setActiveButton(this);
-      customAmountInput.disabled = false;
-      customAmountInput.focus();
-      selectedAmount = parseInt(customAmountInput.value) || 2000;
-    } else {
-      setActiveButton(this);
-      customAmountInput.disabled = true;
-      selectedAmount = parseInt(val);
-      customAmountInput.value = val;
-    }
-  });
-});
-
-customAmountInput.addEventListener('input', function() {
-  const val = parseInt(this.value);
-  if (!isNaN(val) && val > 0) {
-    selectedAmount = val;
-    amountButtons.forEach(b => b.classList.remove('active'));
-    const customBtn = document.querySelector('#donationAmounts button[data-amount="custom"]');
-    if (customBtn) customBtn.classList.add('active');
-    customAmountInput.disabled = false;
-  }
-});
-
-// ============================================
-// DONATE BUTTON
-// ============================================
-donateBtn.addEventListener('click', async function() {
-  if (donationUnlocked) {
-    donateStatus.textContent = '✅ You already have permanent access!';
-    return;
-  }
-
-  const amount = selectedAmount;
-  const email = donorEmailInput.value.trim();
-
-  if (!amount || amount < 50) {
-    donateStatus.textContent = '⚠️ Please enter a valid amount (min ₦50)';
-    return;
-  }
-
-  if (!email || !email.includes('@')) {
-    donateStatus.textContent = '⚠️ Please enter a valid email address';
-    donorEmailInput.focus();
-    return;
-  }
-
-  // Save email for next visit
-  localStorage.setItem('abanabame_email', email);
-  currentEmail = email;
-
-  donateStatus.textContent = '⏳ Initiating payment...';
-  donateBtn.disabled = true;
-
-  try {
-    const response = await fetch(CONFIG.backendUrl, {
-      method: 'POST',
-      headers: { 
-        'Content-Type': 'application/json',
-        'Accept': 'application/json'
-      },
-      body: JSON.stringify({
-        amount: amount,
-        email: email,
-        callback_url: window.location.href.split('?')[0] + '?reference={{reference}}'
-      })
-    });
-
-    const data = await response.json();
-
-    if (data.success && data.authorization_url) {
-      donateStatus.textContent = '🔄 Redirecting to Paystack...';
-      window.location.href = data.authorization_url;
-    } else {
-      donateStatus.textContent = '❌ Error: ' + (data.error || 'Could not initiate payment');
-      donateBtn.disabled = false;
-    }
-
-  } catch (err) {
-    donateStatus.textContent = '❌ Network error. Please try again.';
-    donateBtn.disabled = false;
-    console.error('Donation error:', err);
-  }
-});
-
-// ============================================
-// VERIFY PAYMENT ON RETURN
-// ============================================
-async function verifyPayment() {
-  const urlParams = new URLSearchParams(window.location.search);
-  const reference = urlParams.get('reference');
-  const paymentSuccess = urlParams.get('payment');
-
-  if (reference) {
-    try {
-      const response = await fetch(CONFIG.verifyPaymentUrl, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ reference: reference })
-      });
-      
-      const data = await response.json();
-      
-      if (data.verified) {
-        donationUnlocked = true;
-        localStorage.setItem('abanabame_email', data.email);
-        document.getElementById('donationMessage').innerHTML = 
-          '✅ <span>Permanent Access Unlocked!</span>';
-        document.getElementById('donateStatus').textContent = 
-          '🎉 Thank you! You now have permanent access to Abanabame.';
-        document.getElementById('donateStatus').style.color = '#4ade80';
-        donateBtn.textContent = '✅ Unlocked';
-        donateBtn.disabled = true;
-        donateBtn.style.opacity = '0.6';
-        
-        // Play the full song
-        audio.play();
-        playBtn.textContent = '⏸';
-        playBtn.classList.add('playing');
-        vinylRecord.classList.add('playing');
-        
-        // Remove reference from URL
-        window.history.replaceState({}, document.title, window.location.pathname);
-      } else {
-        donateStatus.textContent = '⚠️ Payment verification failed. Please contact support.';
+      // DONATION AMOUNT SELECTION
+      function setActiveButton(btn) {
+        amountButtons.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
       }
-    } catch (error) {
-      console.error('Verification error:', error);
-      donateStatus.textContent = '❌ Error verifying payment. Please contact support.';
-    }
-  }
-}
 
-// Check for payment verification on load
-verifyPayment();
+      amountButtons.forEach(btn => {
+        btn.addEventListener('click', function() {
+          const val = this.dataset.amount;
+          if (val === 'custom') {
+            setActiveButton(this);
+            customAmountInput.disabled = false;
+            customAmountInput.focus();
+            selectedAmount = parseInt(customAmountInput.value) || 2000;
+          } else {
+            setActiveButton(this);
+            customAmountInput.disabled = true;
+            selectedAmount = parseInt(val);
+            customAmountInput.value = val;
+          }
+        });
+      });
 
-// ============================================
-// 30-SECOND PREVIEW
-// ============================================
-audio.addEventListener('timeupdate', () => {
-  if (audio.currentTime >= 30 && !donationUnlocked) {
-    audio.pause();
-    playBtn.textContent = '▶';
-    playBtn.classList.remove('playing');
-    vinylRecord.classList.remove('playing');
+      customAmountInput.addEventListener('input', function() {
+        const val = parseInt(this.value);
+        if (!isNaN(val) && val > 0) {
+          selectedAmount = val;
+          amountButtons.forEach(b => b.classList.remove('active'));
+          const customBtn = document.querySelector('#donationAmounts button[data-amount="custom"]');
+          if (customBtn) customBtn.classList.add('active');
+          customAmountInput.disabled = false;
+        }
+      });
 
-    document.querySelector('.donation-section').scrollIntoView({
-      behavior: 'smooth'
-    });
+      // DONATE BUTTON
+      donateBtn.addEventListener('click', async function() {
+        if (donationUnlocked) {
+          donateStatus.textContent = '✅ You already have permanent access!';
+          return;
+        }
 
-    document.getElementById('donationMessage').innerHTML =
-      '❤️ <span>30 seconds preview complete. Support Abanabame to continue listening.</span>';
+        const amount = selectedAmount;
+        const email = donorEmailInput.value.trim();
 
-    document.getElementById('donateStatus').textContent =
-      '🎵 Donate once to unlock the full song forever!';
-  }
-});
+        if (!amount || amount < 50) {
+          donateStatus.textContent = '⚠️ Please enter a valid amount (min ₦50)';
+          return;
+        }
 
-// ============================================
-// INITIAL SETUP
-// ============================================
-const defaultCustomBtn = document.querySelector('#donationAmounts button[data-amount="custom"]');
-if (defaultCustomBtn) {
-  setActiveButton(defaultCustomBtn);
-  customAmountInput.disabled = false;
-  customAmountInput.value = 2000;
-  selectedAmount = 2000;
-}
+        if (!email || !email.includes('@')) {
+          donateStatus.textContent = '⚠️ Please enter a valid email address';
+          donorEmailInput.focus();
+          return;
+        }
 
-console.log('🎵 Abanabame with Permanent Unlock!');
-console.log(`📍 Backend URL: ${CONFIG.backendUrl}`);
-console.log(`🔍 Check Unlock URL: ${CONFIG.checkUnlockUrl}`);
-console.log(`✅ Verify Payment URL: ${CONFIG.verifyPaymentUrl}`);
+        localStorage.setItem('abanabame_email', email);
+        currentEmail = email;
+
+        donateStatus.textContent = '⏳ Initiating payment...';
+        donateBtn.disabled = true;
+
+        try {
+          const response = await fetch(CONFIG.backendUrl, {
+            method: 'POST',
+            headers: { 
+              'Content-Type': 'application/json',
+              'Accept': 'application/json'
+            },
+            body: JSON.stringify({
+              amount: amount,
+              email: email,
+              callback_url: window.location.href.split('?')[0] + '?reference={{reference}}'
+            })
+          });
+
+          const data = await response.json();
+
+          if (data.success && data.authorization_url) {
+            donateStatus.textContent = '🔄 Redirecting to Paystack...';
+            window.location.href = data.authorization_url;
+          } else {
+            donateStatus.textContent = '❌ Error: ' + (data.error || 'Could not initiate payment');
+            donateBtn.disabled = false;
+          }
+
+        } catch (err) {
+          donateStatus.textContent = '❌ Network error. Please try again.';
+          donateBtn.disabled = false;
+          console.error('Donation error:', err);
+        }
+      });
+
+      // VERIFY PAYMENT ON RETURN
+      async function verifyPayment() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const reference = urlParams.get('reference');
+
+        if (reference) {
+          try {
+            const response = await fetch(CONFIG.verifyPaymentUrl, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ reference: reference })
+            });
+            
+            const data = await response.json();
+            
+            if (data.verified) {
+              donationUnlocked = true;
+              localStorage.setItem('abanabame_email', data.email);
+              document.getElementById('donationMessage').innerHTML = 
+                '✅ <span>Permanent Access Unlocked!</span>';
+              document.getElementById('donateStatus').textContent = 
+                '🎉 Thank you! You now have permanent access to Abanabame.';
+              document.getElementById('donateStatus').style.color = '#4ade80';
+              donateBtn.textContent = '✅ Unlocked';
+              donateBtn.disabled = true;
+              donateBtn.style.opacity = '0.6';
+              
+              audio.play();
+              playBtn.textContent = '⏸';
+              playBtn.classList.add('playing');
+              vinylRecord.classList.add('playing');
+              
+              window.history.replaceState({}, document.title, window.location.pathname);
+            } else {
+              donateStatus.textContent = '⚠️ Payment verification failed. Please contact support.';
+            }
+          } catch (error) {
+            console.error('Verification error:', error);
+            donateStatus.textContent = '❌ Error verifying payment. Please contact support.';
+          }
+        }
+      }
+
+      verifyPayment();
+
+      // 30-SECOND PREVIEW
+      audio.addEventListener('timeupdate', () => {
+        if (audio.currentTime >= 30 && !donationUnlocked) {
+          audio.pause();
+          playBtn.textContent = '▶';
+          playBtn.classList.remove('playing');
+          vinylRecord.classList.remove('playing');
+
+          document.querySelector('.donation-section').scrollIntoView({
+            behavior: 'smooth'
+          });
+
+          document.getElementById('donationMessage').innerHTML =
+            '❤️ <span>30 seconds preview complete. Support Abanabame to continue listening.</span>';
+
+          document.getElementById('donateStatus').textContent =
+            '🎵 Donate once to unlock the full song forever!';
+        }
+      });
+
+      // ============================================
+      // 5. SHARE FUNCTIONALITY
+      // ============================================
+      
+      // Share on WhatsApp
+      document.getElementById('shareWhatsAppBtn').addEventListener('click', function() {
+        const message = encodeURIComponent(
+          '🎵 Listen to "Abanabame" by Silas Ibhadode!\n' +
+          'A soulful worship song that will bless your heart ❤️\n\n' +
+          '🔗 Listen here: ' + CONFIG.appUrl + '\n\n' +
+          'Support the ministry and unlock the full song forever! 🙏'
+        );
+        
+        // Check if running in Capacitor
+        if (window.Capacitor && window.Capacitor.isNative) {
+          // Use Capacitor's share plugin if available
+          if (window.Share) {
+            window.Share.share({
+              title: 'Abanabame by Silas Ibhadode',
+              text: '🎵 Listen to Abanabame by Silas Ibhadode! Support the ministry ❤️',
+              url: CONFIG.appUrl
+            });
+          } else {
+            // Fallback for Capacitor without share plugin
+            window.open(`https://api.whatsapp.com/send?text=${message}`, '_blank');
+          }
+        } else {
+          // Web fallback - try native share first
+          if (navigator.share) {
+            navigator.share({
+              title: 'Abanabame by Silas Ibhadode',
+              text: '🎵 Listen to Abanabame by Silas Ibhadode! Support the ministry ❤️',
+              url: CONFIG.appUrl
+            }).catch(err => {
+              // If user cancels or share fails, fallback to WhatsApp
+              if (err.name !== 'AbortError') {
+                window.open(`https://api.whatsapp.com/send?text=${message}`, '_blank');
+              }
+            });
+          } else {
+            // Direct WhatsApp link
+            window.open(`https://api.whatsapp.com/send?text=${message}`, '_blank');
+          }
+        }
+      });
+
+      // Copy Link
+      document.getElementById('copyLinkBtn').addEventListener('click', function() {
+        const url = CONFIG.appUrl;
+        
+        // Check if running in Capacitor with clipboard plugin
+        if (window.Capacitor && window.Capacitor.isNative && window.Clipboard) {
+          window.Clipboard.write({
+            string: url
+          }).then(() => {
+            const status = document.getElementById('donateStatus');
+            status.textContent = '✅ Link copied to clipboard!';
+            status.style.color = '#4ade80';
+            setTimeout(() => {
+              status.textContent = '💫 share the blessing with others';
+              status.style.color = '#b8a88a';
+            }, 3000);
+          });
+        } else {
+          // Web clipboard API
+          if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(url).then(() => {
+              const status = document.getElementById('donateStatus');
+              status.textContent = '✅ Link copied to clipboard!';
+              status.style.color = '#4ade80';
+              setTimeout(() => {
+                status.textContent = '💫 share the blessing with others';
+                status.style.color = '#b8a88a';
+              }, 3000);
+            }).catch(() => {
+              // Fallback method
+              copyLinkFallback(url);
+            });
+          } else {
+            copyLinkFallback(url);
+          }
+        }
+      });
+
+      function copyLinkFallback(url) {
+        // Create a temporary input element
+        const tempInput = document.createElement('input');
+        tempInput.value = url;
+        document.body.appendChild(tempInput);
+        tempInput.select();
+        document.execCommand('copy');
+        document.body.removeChild(tempInput);
+        
+        const status = document.getElementById('donateStatus');
+        status.textContent = '✅ Link copied to clipboard!';
+        status.style.color = '#4ade80';
+        setTimeout(() => {
+          status.textContent = '💫 share the blessing with others';
+          status.style.color = '#b8a88a';
+        }, 3000);
+      }
+
+      // ============================================
+      // INITIAL SETUP
+      // ============================================
+      const defaultCustomBtn = document.querySelector('#donationAmounts button[data-amount="custom"]');
+      if (defaultCustomBtn) {
+        setActiveButton(defaultCustomBtn);
+        customAmountInput.disabled = false;
+        customAmountInput.value = 2000;
+        selectedAmount = 2000;
+      }
+
+      console.log('🎵 Abanabame with Permanent Unlock!');
+      console.log(`📍 App URL: ${CONFIG.appUrl}`);
+      console.log(`📍 Backend URL: ${CONFIG.backendUrl}`);
+      console.log('📱 Share on WhatsApp ready!');
+      console.log('📋 Copy link ready!');
     })();
   </script>
 
