@@ -8,11 +8,11 @@
 }
 
 body {
-  background: #0a0a12;
+  background: radial-gradient(circle at top, #221b14 0%, #0a0a12 45%, #07070c 100%);
   min-height: 100vh;
   font-family: -apple-system, 'Segoe UI', Roboto, sans-serif;
   color: #f0e0c0;
-  padding: 10px;
+  padding: 0;
 }
 
 #particleCanvas {
@@ -28,8 +28,91 @@ body {
 #app {
   position: relative;
   z-index: 1;
-  max-width: 500px;
+  max-width: 1440px;
   margin: 0 auto;
+}
+
+.app-shell {
+  display: grid;
+  grid-template-columns: 220px minmax(0, 1fr) 260px;
+  gap: 20px;
+  padding: 20px;
+}
+
+.side-rail {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.left-rail,
+.right-rail {
+  padding-top: 10px;
+}
+
+.rail-brand {
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: #f5c88a;
+  letter-spacing: 1px;
+}
+
+.rail-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.rail-btn {
+  width: 100%;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.04);
+  color: #f0e0c0;
+  border: 1px solid rgba(255, 200, 120, 0.08);
+  text-align: left;
+  cursor: pointer;
+}
+
+.rail-btn.active,
+.rail-btn:hover {
+  background: linear-gradient(135deg, rgba(245,184,126,0.2), rgba(212,148,90,0.16));
+  border-color: rgba(245,184,126,0.5);
+}
+
+.rail-card {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 200, 120, 0.08);
+  border-radius: 16px;
+  padding: 16px;
+}
+
+.rail-card h4 {
+  color: #f5c88a;
+  margin-bottom: 8px;
+}
+
+.rail-card p {
+  color: #8a7d6a;
+  font-size: 0.85rem;
+  line-height: 1.5;
+}
+
+.main-column {
+  min-width: 0;
+}
+
+.content-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 340px;
+  gap: 20px;
+  align-items: start;
+}
+
+.side-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
 }
 
 /* Header */
@@ -37,7 +120,7 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 15px 0;
+  padding: 8px 0 18px;
   border-bottom: 1px solid rgba(255, 200, 120, 0.1);
   margin-bottom: 20px;
 }
@@ -704,6 +787,25 @@ body {
 }
 
 /* Responsive */
+@media (max-width: 1050px) {
+  .app-shell {
+    grid-template-columns: 1fr;
+  }
+
+  .left-rail,
+  .right-rail {
+    order: 2;
+  }
+
+  .main-column {
+    order: 1;
+  }
+
+  .content-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
 @media (max-width: 450px) {
   .song-grid {
     grid-template-columns: 1fr 1fr;

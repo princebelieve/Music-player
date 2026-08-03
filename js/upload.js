@@ -16,6 +16,58 @@ function closeUploadModal() {
   }
 }
 
+function showCreatorRequestModal() {
+  const modal = document.getElementById('creatorRequestModal');
+  if (modal) {
+    modal.classList.add('show');
+  }
+}
+
+function closeCreatorRequestModal() {
+  const modal = document.getElementById('creatorRequestModal');
+  if (modal) {
+    modal.classList.remove('show');
+  }
+}
+
+async function submitCreatorRequest() {
+  const name = document.getElementById('creatorName').value.trim();
+  const email = document.getElementById('creatorEmail').value.trim();
+  const stageName = document.getElementById('creatorStageName').value.trim();
+  const bio = document.getElementById('creatorBio').value.trim();
+  const statusEl = document.getElementById('creatorRequestStatus');
+
+  if (!name || !email || !stageName) {
+    statusEl.textContent = '⚠️ Name, email and stage name are required';
+    return;
+  }
+
+  statusEl.textContent = '⏳ Sending creator request...';
+  statusEl.style.color = '#8a7d6a';
+
+  try {
+    const data = await apiFetch('/admin/make-creator', {
+      method: 'POST',
+      body: JSON.stringify({ email, name, stageName, bio })
+    });
+
+    if (data.success) {
+      statusEl.textContent = '✅ Creator request received. An admin will review it.';
+      statusEl.style.color = '#4ade80';
+      setTimeout(() => {
+        closeCreatorRequestModal();
+        statusEl.textContent = '';
+      }, 2500);
+    } else {
+      statusEl.textContent = '❌ ' + (data.error || 'Request failed');
+      statusEl.style.color = '#f87171';
+    }
+  } catch (e) {
+    statusEl.textContent = '❌ Network error. Please try again.';
+    statusEl.style.color = '#f87171';
+  }
+}
+
 async function submitUpload() {
   const title = document.getElementById('uploadTitle').value.trim();
   const artist = document.getElementById('uploadArtist').value.trim();
@@ -144,5 +196,8 @@ async function loadMySongs() {
 
 window.showUploadModal = showUploadModal;
 window.closeUploadModal = closeUploadModal;
+window.showCreatorRequestModal = showCreatorRequestModal;
+window.closeCreatorRequestModal = closeCreatorRequestModal;
+window.submitCreatorRequest = submitCreatorRequest;
 window.submitUpload = submitUpload;
 window.loadMySongs = loadMySongs;

@@ -22,10 +22,25 @@ function showUserUI(user) {
   menu.style.display = 'flex';
   document.getElementById('userNameDisplay').textContent = user.name || user.email;
   document.getElementById('avatarText').textContent = (user.name || 'U')[0].toUpperCase();
-  
+
+  const creatorDashboard = document.getElementById('creatorDashboard');
+  const creatorDashboardMessage = document.getElementById('creatorDashboardMessage');
+  const uploadSongBtn = document.getElementById('uploadSongBtn');
+
+  if (creatorDashboard) {
+    creatorDashboard.style.display = 'block';
+  }
+
   if (user.isCreator) {
-    document.getElementById('creatorDashboard').style.display = 'block';
+    if (creatorDashboardMessage) {
+      creatorDashboardMessage.textContent = 'Your creator account is active. You can upload songs below.';
+    }
+    if (uploadSongBtn) {
+      uploadSongBtn.style.display = 'inline-block';
+    }
     loadMySongs();
+  } else if (creatorDashboardMessage) {
+    creatorDashboardMessage.textContent = 'You are signed in as a user. Use the upload button to start the creator request flow.';
   }
 
   if (user.isAdmin) {

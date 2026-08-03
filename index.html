@@ -21,93 +21,120 @@
 
   <canvas id="particleCanvas"></canvas>
 
-  <div id="app">
-    <!-- Header -->
-    <header class="app-header">
-      <div class="app-logo">🎵 Gospel Music</div>
-      <div class="header-actions">
-        <button class="btn" id="authBtn" onclick="window.showAuthModal()">Sign In</button>
-        <div id="userMenu" style="display:none;">
-          <span class="user-name" id="userNameDisplay">User</span>
-          <div class="user-avatar" id="userAvatar"><span id="avatarText">U</span></div>
-          <button class="btn btn-danger" onclick="window.logout()">Logout</button>
+  <div id="app" class="app-shell">
+    <aside class="side-rail left-rail">
+      <div class="rail-brand">🎵 ABANABAME</div>
+      <nav class="rail-nav">
+        <button class="rail-btn active">Home</button>
+        <button class="rail-btn">Trending</button>
+        <button class="rail-btn">Library</button>
+        <button class="rail-btn">Discover</button>
+      </nav>
+      <div class="rail-card">
+        <h4>Creator Access</h4>
+        <p>Upload your songs and grow your ministry presence.</p>
+      </div>
+    </aside>
+
+    <main class="main-column">
+      <header class="app-header">
+        <div class="app-logo">🎵 Gospel Music</div>
+        <div class="header-actions">
+          <button class="btn" id="authBtn" onclick="window.showAuthModal()">Sign In</button>
+          <div id="userMenu" style="display:none;" class="user-menu">
+            <span class="user-name" id="userNameDisplay">User</span>
+            <div class="user-avatar" id="userAvatar"><span id="avatarText">U</span></div>
+            <button class="btn btn-danger" onclick="window.logout()">Logout</button>
+          </div>
+        </div>
+      </header>
+
+      <div class="player-card">
+        <div class="song-header">
+          <img class="song-cover" id="currentCover" src="" alt="Cover">
+          <div class="song-info">
+            <div class="song-title" id="currentTitle">Loading...</div>
+            <div class="song-artist" id="currentArtist">...</div>
+            <span class="song-status status-locked" id="songStatus">🔒 Locked</span>
+          </div>
+        </div>
+
+        <div class="lyric-box">
+          <div id="lyricsDisplay">Select a song to see lyrics</div>
+        </div>
+
+        <div class="audio-controls">
+          <button class="play-btn" id="playBtn">▶</button>
+          <span class="time-display" id="timeDisplay">0:00 / 0:00</span>
+          <input type="range" class="progress-bar" id="progressBar" min="0" max="100" value="0">
+          <input type="range" class="volume-slider" id="volumeSlider" min="0" max="100" value="80">
         </div>
       </div>
-    </header>
 
-    <!-- Player -->
-    <div class="player-card">
-      <div class="song-header">
-        <img class="song-cover" id="currentCover" src="" alt="Cover">
-        <div class="song-info">
-          <div class="song-title" id="currentTitle">Loading...</div>
-          <div class="song-artist" id="currentArtist">...</div>
-          <span class="song-status status-locked" id="songStatus">🔒 Locked</span>
+      <div class="content-grid">
+        <div class="library-section">
+          <h3>📚 SONG LIBRARY</h3>
+          <div class="search-bar" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;">
+            <input id="searchInput" type="text" placeholder="Search songs, artist, or tag" style="flex:1;min-width:220px;">
+            <button class="btn" id="searchBtn">Search</button>
+            <button class="btn" id="clearSearchBtn">Clear</button>
+          </div>
+          <div class="song-grid" id="songGrid">
+            <div class="loading">Loading songs...</div>
+          </div>
+        </div>
+
+        <div class="side-stack">
+          <div class="donation-section" id="donationSection">
+            <h3 id="donationMessage">❤️ Support <span id="donationSongName">this song</span></h3>
+            <div class="donation-amounts" id="donationAmounts">
+              <button data-amount="500">₦500</button>
+              <button data-amount="1000">₦1,000</button>
+              <button data-amount="2000" class="active">₦2,000</button>
+              <button data-amount="5000">₦5,000</button>
+              <button data-amount="custom">Custom</button>
+            </div>
+            <div class="donation-custom">
+              <input type="number" id="customAmount" placeholder="Amount" min="100" value="2000">
+            </div>
+            <div class="donation-email">
+              <input type="email" id="donorEmail" placeholder="Your email address">
+            </div>
+            <button class="donate-btn" id="donateBtn">💖 Donate & Unlock</button>
+            <div class="donate-status" id="donateStatus">✨ Support the artist</div>
+            
+            <div class="share-section">
+              <button class="share-btn share-whatsapp" id="shareWhatsAppBtn">💬 Share</button>
+              <button class="share-btn share-copy" id="copyLinkBtn">📋 Copy Link</button>
+            </div>
+          </div>
+
+          <div class="creator-dashboard" id="creatorDashboard" style="display:block;">
+            <h3>🎵 Creator Dashboard</h3>
+            <div id="creatorDashboardMessage" style="color:#6a5d4a;font-size:0.9rem;margin-bottom:10px;">Upload a song to begin. If you are not a creator yet, you will be guided to register as one.</div>
+            <button class="upload-btn" id="uploadSongBtn" onclick="window.showUploadModal()">📤 Upload New Song</button>
+            <div id="mySongsList" style="margin-top:10px;"></div>
+          </div>
+
+          <div class="creator-dashboard" id="adminDashboard" style="display:none;">
+            <h3>👑 Admin Dashboard</h3>
+            <div id="adminStats" style="color:#6a5d4a;font-size:0.9rem;">Admin tools are available once you sign in as an admin.</div>
+            <div id="adminUsersList" style="margin-top:12px;"></div>
+          </div>
         </div>
       </div>
+    </main>
 
-      <div class="lyric-box">
-        <div id="lyricsDisplay">Select a song to see lyrics</div>
+    <aside class="side-rail right-rail">
+      <div class="rail-card">
+        <h4>Now Playing</h4>
+        <p id="nowPlayingMini">Select a song to begin.</p>
       </div>
-
-      <div class="audio-controls">
-        <button class="play-btn" id="playBtn">▶</button>
-        <span class="time-display" id="timeDisplay">0:00 / 0:00</span>
-        <input type="range" class="progress-bar" id="progressBar" min="0" max="100" value="0">
-        <input type="range" class="volume-slider" id="volumeSlider" min="0" max="100" value="80">
+      <div class="rail-card">
+        <h4>Community</h4>
+        <p>Support gospel artists and unlock music permanently.</p>
       </div>
-    </div>
-
-    <!-- Library -->
-    <div class="library-section">
-      <h3>📚 SONG LIBRARY</h3>
-      <div class="search-bar" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;">
-        <input id="searchInput" type="text" placeholder="Search songs, artist, or tag" style="flex:1;min-width:220px;">
-        <button class="btn" id="searchBtn">Search</button>
-        <button class="btn" id="clearSearchBtn">Clear</button>
-      </div>
-      <div class="song-grid" id="songGrid">
-        <div class="loading">Loading songs...</div>
-      </div>
-    </div>
-
-    <!-- Donation -->
-    <div class="donation-section" id="donationSection">
-      <h3 id="donationMessage">❤️ Support <span id="donationSongName">this song</span></h3>
-      <div class="donation-amounts" id="donationAmounts">
-        <button data-amount="500">₦500</button>
-        <button data-amount="1000">₦1,000</button>
-        <button data-amount="2000" class="active">₦2,000</button>
-        <button data-amount="5000">₦5,000</button>
-        <button data-amount="custom">Custom</button>
-      </div>
-      <div class="donation-custom">
-        <input type="number" id="customAmount" placeholder="Amount" min="100" value="2000">
-      </div>
-      <div class="donation-email">
-        <input type="email" id="donorEmail" placeholder="Your email address">
-      </div>
-      <button class="donate-btn" id="donateBtn">💖 Donate & Unlock</button>
-      <div class="donate-status" id="donateStatus">✨ Support the artist</div>
-      
-      <div class="share-section">
-        <button class="share-btn share-whatsapp" id="shareWhatsAppBtn">💬 Share</button>
-        <button class="share-btn share-copy" id="copyLinkBtn">📋 Copy Link</button>
-      </div>
-    </div>
-
-    <!-- Creator Dashboard -->
-    <div class="creator-dashboard" id="creatorDashboard">
-      <h3>🎵 Creator Dashboard</h3>
-      <button class="upload-btn" onclick="window.showUploadModal()">📤 Upload New Song</button>
-      <div id="mySongsList" style="margin-top:10px;"></div>
-    </div>
-
-    <div class="creator-dashboard" id="adminDashboard" style="display:none;">
-      <h3>👑 Admin Dashboard</h3>
-      <div id="adminStats" style="color:#6a5d4a;font-size:0.9rem;">Admin tools are available once you sign in as an admin.</div>
-      <div id="adminUsersList" style="margin-top:12px;"></div>
-    </div>
+    </aside>
 
     <!-- Modals -->
     <div class="modal" id="authModal">
@@ -126,6 +153,20 @@
           <span id="authSwitchText">Don't have an account?</span>
           <a href="#" onclick="window.toggleAuthMode()">Sign Up</a>
         </div>
+      </div>
+    </div>
+
+    <div class="modal" id="creatorRequestModal">
+      <div class="modal-content">
+        <span class="close-btn" onclick="window.closeCreatorRequestModal()">✕</span>
+        <h2>🎤 Apply as Creator</h2>
+        <p style="color:#6a5d4a; font-size:0.9rem; margin-bottom:10px;">You can start by applying as a creator. An admin will review your request and unlock uploads.</p>
+        <input type="text" id="creatorName" placeholder="Your full name *">
+        <input type="email" id="creatorEmail" placeholder="Email address *">
+        <input type="text" id="creatorStageName" placeholder="Stage name / artist name *">
+        <textarea id="creatorBio" placeholder="Tell us a little about your ministry or brand"></textarea>
+        <button class="btn btn-primary" style="width:100%;padding:12px;font-size:1rem;margin-top:10px;" onclick="window.submitCreatorRequest()">Submit Creator Request</button>
+        <div id="creatorRequestStatus" style="text-align:center;margin-top:8px;font-size:0.85rem;color:#8a7d6a;"></div>
       </div>
     </div>
 
