@@ -667,7 +667,6 @@ function closeUploadModal() {
 async function submitUpload() {
   const title = document.getElementById('uploadTitle').value.trim();
   const artist = document.getElementById('uploadArtist').value.trim();
-  const price = parseInt(document.getElementById('uploadPrice').value) || 2000;
   const preview = parseInt(document.getElementById('uploadPreview').value) || 30;
   const lyricsText = document.getElementById('uploadLyrics').value.trim();
   const audioFile = document.getElementById('uploadAudio').files[0];
@@ -685,12 +684,9 @@ async function submitUpload() {
   
   let lyrics = [];
   if (lyricsText) {
-    try {
-      lyrics = JSON.parse(lyricsText);
-    } catch (e) {
-      document.getElementById('uploadStatus').textContent = '⚠️ Invalid JSON format for lyrics';
-      return;
-    }
+    lyrics = parseLyricsInput(lyricsText);
+    if (!Array.isArray(lyrics)) {
+      document.getElementById('uploadStatus').textContent = '⚠️ Invalid lyrics format. Use plain text or optional timestamps like [00:15]';
   }
   
   document.getElementById('uploadStatus').textContent = '⏳ Uploading...';
@@ -698,7 +694,6 @@ async function submitUpload() {
   const formData = new FormData();
   formData.append('title', title);
   formData.append('artist', artist);
-  formData.append('price', price);
   formData.append('previewDuration', preview);
   formData.append('lyrics', JSON.stringify(lyrics));
   formData.append('audio', audioFile);
@@ -734,6 +729,44 @@ async function submitUpload() {
     document.getElementById('uploadStatus').textContent = '❌ Network error. Try again.';
     console.error(e);
   }
+}
+
+function parseLyricsInput(text) {
+  const trimmed = text.trim();
+  if (!trimmed) return [];
+
+  try {
+    const parsed = JSON.parse(trimmed);
+    if (Array.isArray(parsed)) return parsed;
+  } catch (e) {
+    // fallback to plain text format
+  }
+
+  const lines = trimmed.split(/\r?\n/).map(line => line.trim()).filter(Boolean);
+  if (lines.length === 0) return [];
+
+  const parsed = [];
+
+  for (const line of lines) {
+    const match = line.match(/^\s*\[(\d{1,2}):(\d{2})(?:[\.:](\d{1,2}))?\]\s*(.*)$/);
+    if (!match) {
+      return null;
+    }
+
+    const minutes = parseInt(match[1], 10);
+    const seconds = parseInt(match[2], 10);
+    const fraction = match[3] ? parseInt(match[3].padEnd(2, '0'), 10) : 0;
+    const time = minutes * 60 + seconds + fraction / 100;
+    const textLine = match[4].trim();
+
+    if (!textLine) {
+      return null;
+    }
+
+    parsed.push({ time, text: textLine });
+  }
+
+  return parsed;
 }
 
 async function loadMySongs() {

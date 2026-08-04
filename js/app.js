@@ -9,7 +9,7 @@ window.state = {
   songs: [],
   currentSongId: null,
   unlocked: false,
-  selectedAmount: 2000
+  selectedAmount: 0
 };
 
 // Initialize app

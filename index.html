@@ -97,30 +97,6 @@
         </div>
 
         <div class="side-stack">
-          <div class="donation-section" id="donationSection">
-            <h3 id="donationMessage">❤️ Support <span id="donationSongName">this song</span></h3>
-            <div class="donation-amounts" id="donationAmounts">
-              <button data-amount="500">₦500</button>
-              <button data-amount="1000">₦1,000</button>
-              <button data-amount="2000" class="active">₦2,000</button>
-              <button data-amount="5000">₦5,000</button>
-              <button data-amount="custom">Custom</button>
-            </div>
-            <div class="donation-custom">
-              <input type="number" id="customAmount" placeholder="Amount" min="100" value="2000">
-            </div>
-            <div class="donation-email">
-              <input type="email" id="donorEmail" placeholder="Your email address">
-            </div>
-            <button class="donate-btn" id="donateBtn">💖 Donate & Unlock</button>
-            <div class="donate-status" id="donateStatus">✨ Support the artist</div>
-            
-            <div class="share-section">
-              <button class="share-btn share-whatsapp" id="shareWhatsAppBtn">💬 Share</button>
-              <button class="share-btn share-copy" id="copyLinkBtn">📋 Copy Link</button>
-            </div>
-          </div>
-
           <div class="creator-dashboard" id="adminDashboard" style="display:none;">
             <h3>👑 Admin Dashboard</h3>
             <div id="adminStats" style="color:#6a5d4a;font-size:0.9rem;">Admin tools are available once you sign in as an admin.</div>
@@ -143,6 +119,31 @@
         <h4>Now Playing</h4>
         <p id="nowPlayingMini">Select a song to begin.</p>
       </div>
+
+      <div class="donation-section" id="donationSection">
+        <h3 id="donationMessage">❤️ Support <span id="donationSongName">this song</span></h3>
+        <div class="donation-amounts" id="donationAmounts">
+          <button data-amount="500">₦500</button>
+          <button data-amount="1000">₦1,000</button>
+          <button data-amount="2000">₦2,000</button>
+          <button data-amount="5000">₦5,000</button>
+          <button data-amount="custom">Custom</button>
+        </div>
+        <div class="donation-custom">
+          <input type="number" id="customAmount" placeholder="Custom amount" min="100">
+        </div>
+        <div class="donation-email">
+          <input type="email" id="donorEmail" placeholder="Your email address">
+        </div>
+        <button class="donate-btn" id="donateBtn">💖 Donate & Unlock</button>
+        <div class="donate-status" id="donateStatus">✨ Support the artist</div>
+        
+        <div class="share-section">
+          <button class="share-btn share-whatsapp" id="shareWhatsAppBtn">💬 Share</button>
+          <button class="share-btn share-copy" id="copyLinkBtn">📋 Copy Link</button>
+        </div>
+      </div>
+
       <div class="rail-card">
         <h4>Community</h4>
         <p>Support gospel artists and unlock music permanently.</p>
@@ -189,14 +190,13 @@
         <h2>📤 Upload Song</h2>
         <input type="text" id="uploadTitle" placeholder="Song Title *">
         <input type="text" id="uploadArtist" placeholder="Artist Name *">
-        <input type="text" id="uploadPrice" placeholder="Price (₦)" value="2000">
         <input type="number" id="uploadPreview" placeholder="Preview Duration (seconds)" value="30">
         <label style="color:#6a5d4a;font-size:0.85rem;display:block;margin-top:8px;">Audio File (MP3)</label>
         <input type="file" id="uploadAudio" accept="audio/*">
         <label style="color:#6a5d4a;font-size:0.85rem;display:block;margin-top:8px;">Cover Image</label>
         <input type="file" id="uploadCover" accept="image/*">
-        <label style="color:#6a5d4a;font-size:0.85rem;display:block;margin-top:8px;">Lyrics (JSON format)</label>
-        <textarea id="uploadLyrics" placeholder='[{"time":0,"text":"Verse 1"}]'></textarea>
+        <label style="color:#6a5d4a;font-size:0.85rem;display:block;margin-top:8px;">Lyrics (optional, but timestamped lines are required for sync)</label>
+        <textarea id="uploadLyrics" placeholder="Paste lyrics with timestamps like [00:15] Verse line"></textarea>
         <button class="btn btn-primary" style="width:100%;padding:12px;font-size:1rem;margin-top:10px;" onclick="window.submitUpload()">Submit for Review</button>
         <div id="uploadStatus" style="text-align:center;margin-top:8px;font-size:0.85rem;color:#8a7d6a;"></div>
       </div>

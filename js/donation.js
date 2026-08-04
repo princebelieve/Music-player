@@ -61,23 +61,23 @@ function setupDonation() {
       this.classList.add('active');
       if (this.dataset.amount === 'custom') {
         customInput.disabled = false;
+        customInput.value = '';
+        customInput.placeholder = 'Enter amount';
         customInput.focus();
-        window.state.selectedAmount = parseInt(customInput.value) || 100;
+        window.state.selectedAmount = 0;
       } else {
         customInput.disabled = true;
+        customInput.value = this.dataset.amount;
         window.state.selectedAmount = parseInt(this.dataset.amount);
-        customInput.value = window.state.selectedAmount;
       }
     });
   });
   
   customInput.addEventListener('input', function() {
     const val = parseInt(this.value);
-    if (val > 0) {
-      window.state.selectedAmount = val;
-      amountBtns.forEach(b => b.classList.remove('active'));
-      document.querySelector('#donationAmounts button[data-amount="custom"]')?.classList.add('active');
-    }
+    window.state.selectedAmount = val > 0 ? val : 0;
+    amountBtns.forEach(b => b.classList.remove('active'));
+    document.querySelector('#donationAmounts button[data-amount="custom"]')?.classList.add('active');
   });
   
   const savedEmail = localStorage.getItem(CONFIG.EMAIL_KEY);

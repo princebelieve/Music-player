@@ -71,7 +71,6 @@ async function submitCreatorRequest() {
 async function submitUpload() {
   const title = document.getElementById('uploadTitle').value.trim();
   const artist = document.getElementById('uploadArtist').value.trim();
-  const price = parseInt(document.getElementById('uploadPrice').value) || 2000;
   const preview = parseInt(document.getElementById('uploadPreview').value) || 30;
   const lyricsText = document.getElementById('uploadLyrics').value.trim();
   const audioFile = document.getElementById('uploadAudio').files[0];
@@ -90,10 +89,9 @@ async function submitUpload() {
 
   let lyrics = [];
   if (lyricsText) {
-    try {
-      lyrics = JSON.parse(lyricsText);
-    } catch (e) {
-      statusEl.textContent = '⚠️ Invalid JSON format for lyrics';
+    lyrics = parseLyricsInput(lyricsText);
+    if (!Array.isArray(lyrics)) {
+      statusEl.textContent = '⚠️ Invalid lyrics format. Timestamps are required: [00:15] Verse line';
       return;
     }
   }
@@ -110,7 +108,6 @@ async function submitUpload() {
   const formData = new FormData();
   formData.append('title', title);
   formData.append('artist', artist);
-  formData.append('price', price);
   formData.append('previewDuration', preview);
   formData.append('lyrics', JSON.stringify(lyrics));
   formData.append('audio', audioFile);
@@ -136,7 +133,6 @@ async function submitUpload() {
         loadMySongs();
         document.getElementById('uploadTitle').value = '';
         document.getElementById('uploadArtist').value = '';
-        document.getElementById('uploadPrice').value = '2000';
         document.getElementById('uploadPreview').value = '30';
         document.getElementById('uploadLyrics').value = '';
         document.getElementById('uploadAudio').value = '';

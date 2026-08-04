@@ -8,10 +8,10 @@
 }
 
 body {
-  background: radial-gradient(circle at top, #18304f 0%, #0a1222 45%, #07101c 100%);
+  background: radial-gradient(circle at top, #24456d 0%, #0c1830 45%, #07101c 100%);
   min-height: 100vh;
   font-family: -apple-system, 'Segoe UI', Roboto, sans-serif;
-  color: #f0e0c0;
+  color: #f7f0df;
   padding: 0;
 }
 
@@ -45,7 +45,8 @@ body.mobile-nav-padding {
 .creator-dashboard,
 .rail-card,
 .modal-content {
-  background: linear-gradient(180deg, rgba(12, 22, 40, 0.96), rgba(7, 14, 26, 0.94));
+  background: linear-gradient(180deg, rgba(14, 26, 48, 0.98), rgba(7, 15, 28, 0.96));
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.34), inset 0 1px 0 rgba(255,255,255,0.035);
 }
 
 .app-shell {
@@ -64,6 +65,7 @@ body.mobile-nav-padding {
 .left-rail,
 .right-rail {
   padding-top: 10px;
+  align-self: start;
 }
 
 .rail-brand {
@@ -97,10 +99,11 @@ body.mobile-nav-padding {
 }
 
 .rail-card {
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 200, 120, 0.08);
+  background: linear-gradient(180deg, rgba(19, 33, 58, 0.95), rgba(10, 18, 34, 0.92));
+  border: 1px solid rgba(255, 200, 120, 0.12);
   border-radius: 16px;
   padding: 16px;
+  box-shadow: 0 14px 32px rgba(0, 0, 0, 0.25);
 }
 
 .rail-card h4 {
@@ -109,7 +112,7 @@ body.mobile-nav-padding {
 }
 
 .rail-card p {
-  color: #8a7d6a;
+  color: #c3bfd0;
   font-size: 0.85rem;
   line-height: 1.5;
 }
@@ -120,7 +123,7 @@ body.mobile-nav-padding {
 
 .content-grid {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 340px;
+  grid-template-columns: minmax(0, 1fr);
   gap: 20px;
   align-items: start;
 }
@@ -149,11 +152,11 @@ body.mobile-nav-padding {
   gap: 8px;
   flex: 1;
   min-width: 0;
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 200, 120, 0.12);
+  background: linear-gradient(180deg, rgba(255,255,255,0.07), rgba(255,255,255,0.03));
+  border: 1px solid rgba(255, 200, 120, 0.18);
   border-radius: 999px;
-  padding: 8px 10px;
-  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.02);
+  padding: 9px 12px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.24), inset 0 0 0 1px rgba(255,255,255,0.02);
 }
 
 .global-search-bar input,
@@ -175,19 +178,22 @@ body.mobile-nav-padding {
 .search-icon {
   color: #f5c88a;
   font-size: 1rem;
+  font-weight: 800;
 }
 
 .mobile-search-icon {
   display: none;
-  width: 38px;
-  height: 38px;
-  border-radius: 50%;
+  width: 44px;
+  height: 44px;
+  border-radius: 14px;
   align-items: center;
   justify-content: center;
   text-decoration: none;
-  color: #f5c88a;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 200, 120, 0.12);
+  color: #08111f;
+  background: linear-gradient(135deg, #f5b87e, #d4945a);
+  border: 1px solid rgba(245, 184, 126, 0.5);
+  box-shadow: 0 10px 24px rgba(245, 184, 126, 0.26);
+  font-weight: 900;
 }
 
 .mobile-pill-bar {
@@ -231,6 +237,27 @@ body.mobile-nav-padding {
   z-index: 1200;
   align-items: center;
   justify-content: space-between;
+}
+
+.player-card,
+.rail-card,
+.song-card,
+.creator-dashboard,
+.donation-section,
+.modal-content,
+.mobile-library-search {
+  animation: uiLift 0.35s ease-out both;
+}
+
+@keyframes uiLift {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .mobile-nav-item {
@@ -284,11 +311,12 @@ body.mobile-nav-padding {
   border-radius: 30px;
   cursor: pointer;
   font-size: 0.8rem;
-  transition: all 0.3s;
+  transition: all 0.25s ease;
 }
 
 .btn:hover {
-  background: rgba(255, 200, 120, 0.2);
+  background: rgba(255, 200, 120, 0.22);
+  transform: translateY(-1px);
 }
 
 .btn-primary {
@@ -334,11 +362,12 @@ body.mobile-nav-padding {
 
 /* Player Card */
 .player-card {
-  background: rgba(255, 255, 255, 0.03);
+  background: linear-gradient(180deg, rgba(18, 31, 55, 0.98), rgba(9, 18, 34, 0.95));
   border-radius: 25px;
   padding: 20px;
-  border: 1px solid rgba(255, 200, 120, 0.06);
+  border: 1px solid rgba(255, 200, 120, 0.12);
   margin-bottom: 20px;
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.32);
 }
 
 .song-header {
@@ -536,18 +565,20 @@ body.mobile-nav-padding {
 }
 
 .song-card {
-  background: rgba(255, 255, 255, 0.03);
+  background: linear-gradient(180deg, rgba(18, 31, 55, 0.95), rgba(8, 16, 31, 0.92));
   border-radius: 15px;
   padding: 12px;
   cursor: pointer;
-  transition: all 0.3s;
+  transition: all 0.28s ease;
   border: 2px solid transparent;
   text-align: center;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.22);
 }
 
 .song-card:hover {
-  background: rgba(255, 255, 255, 0.06);
-  transform: translateY(-2px);
+  background: linear-gradient(180deg, rgba(28, 47, 80, 0.98), rgba(11, 20, 38, 0.96));
+  transform: translateY(-3px) scale(1.01);
+  box-shadow: 0 16px 30px rgba(0, 0, 0, 0.34);
 }
 
 .song-card.active {
@@ -595,12 +626,16 @@ body.mobile-nav-padding {
 
 /* Donation Section */
 .donation-section {
-  margin-top: 20px;
-  background: rgba(0, 0, 0, 0.3);
+  margin-top: 0;
+  background: linear-gradient(180deg, rgba(13, 24, 43, 0.96), rgba(8, 16, 29, 0.94));
   border-radius: 20px;
   padding: 18px;
-  border: 1px solid rgba(255, 215, 150, 0.05);
+  border: 1px solid rgba(255, 215, 150, 0.08);
   text-align: center;
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
 }
 
 .donation-section h3 {
@@ -961,7 +996,11 @@ body.mobile-nav-padding {
 
   .mobile-library-search {
     display: flex;
-    margin-bottom: 14px;
+    margin-bottom: 16px;
+    border-radius: 18px;
+    padding: 10px 12px;
+    background: linear-gradient(180deg, rgba(18, 31, 55, 0.96), rgba(9, 18, 34, 0.94));
+    box-shadow: 0 10px 35px rgba(0, 0, 0, 0.38);
   }
 
   body.mobile-nav-padding {
@@ -982,6 +1021,8 @@ body.mobile-nav-padding {
 
   .header-actions {
     gap: 6px;
+    width: 100%;
+    justify-content: space-between;
   }
 
   .btn {
