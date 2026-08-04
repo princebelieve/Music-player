@@ -195,9 +195,11 @@
         <input type="file" id="uploadAudio" accept="audio/*">
         <label style="color:#6a5d4a;font-size:0.85rem;display:block;margin-top:8px;">Cover Image</label>
         <input type="file" id="uploadCover" accept="image/*">
-        <label style="color:#6a5d4a;font-size:0.85rem;display:block;margin-top:8px;">Lyrics (optional, but timestamped lines are required for sync)</label>
-        <textarea id="uploadLyrics" placeholder="Paste lyrics with timestamps like [00:15] Verse line"></textarea>
-        <button class="btn btn-primary" style="width:100%;padding:12px;font-size:1rem;margin-top:10px;" onclick="window.submitUpload()">Submit for Review</button>
+        <label style="color:#6a5d4a;font-size:0.85rem;display:block;margin-top:8px;">Lyrics (optional — if provided, every line must include a timestamp)</label>
+        <input type="file" id="uploadLyricsFile" accept=".txt,.lrc,text/plain" style="margin-bottom:10px;" />
+        <textarea id="uploadLyrics" placeholder="Paste timestamped lyrics here, e.g. [00:15] First line"></textarea>
+        <div id="lyricsPreview" style="min-height:4rem;color:#6a5d4a;font-size:0.85rem;white-space:pre-wrap;margin-top:8px;border:1px solid #e5e7eb;padding:10px;border-radius:6px;background:#fafaf9;">Lyrics preview will appear here after you type timestamped lines.</div>
+        <button id="uploadSubmitBtn" class="btn btn-primary" style="width:100%;padding:12px;font-size:1rem;margin-top:10px;" onclick="window.submitUpload()">Submit for Review</button>
         <div id="uploadStatus" style="text-align:center;margin-top:8px;font-size:0.85rem;color:#8a7d6a;"></div>
       </div>
     </div>

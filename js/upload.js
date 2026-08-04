@@ -89,9 +89,9 @@ async function submitUpload() {
 
   let lyrics = [];
   if (lyricsText) {
-    lyrics = parseLyricsInput(lyricsText);
-    if (!Array.isArray(lyrics)) {
-      statusEl.textContent = '⚠️ Invalid lyrics format. Timestamps are required: [00:15] Verse line';
+    lyrics = parseLyricsInput(lyricsText, true);
+    if (!Array.isArray(lyrics) || lyrics.length === 0) {
+      statusEl.textContent = '⚠️ Lyrics must include timestamps on every line if provided.';
       return;
     }
   }
@@ -105,11 +105,16 @@ async function submitUpload() {
   statusEl.textContent = '⏳ Uploading...';
   statusEl.style.color = '#8a7d6a';
 
+  const uploadBtn = document.getElementById('uploadSubmitBtn');
+  if (uploadBtn) uploadBtn.disabled = true;
+
   const formData = new FormData();
   formData.append('title', title);
   formData.append('artist', artist);
   formData.append('previewDuration', preview);
-  formData.append('lyrics', JSON.stringify(lyrics));
+  if (lyrics.length > 0) {
+    formData.append('lyrics', JSON.stringify(lyrics));
+  }
   formData.append('audio', audioFile);
   formData.append('cover', coverFile);
 
@@ -137,18 +142,143 @@ async function submitUpload() {
         document.getElementById('uploadLyrics').value = '';
         document.getElementById('uploadAudio').value = '';
         document.getElementById('uploadCover').value = '';
+        updateLyricsPreview();
         statusEl.textContent = '';
         statusEl.style.color = '#8a7d6a';
+        if (uploadBtn) uploadBtn.disabled = false;
       }, 2500);
     } else {
-      statusEl.textContent = '❌ ' + (data.error || 'Upload failed');
+      statusEl.textContent = '❌ ' + (data.error || `Upload failed (${response.status})`);
       statusEl.style.color = '#f87171';
+      if (uploadBtn) uploadBtn.disabled = false;
     }
   } catch (e) {
     statusEl.textContent = '❌ Network error. Try again.';
     statusEl.style.color = '#f87171';
+    if (uploadBtn) uploadBtn.disabled = false;
     console.error('Upload error:', e);
   }
+}
+
+function parseLyricsInput(text, requireTimestamps = false) {
+  const trimmed = String(text || '').trim();
+  if (!trimmed) return [];
+
+  try {
+    const parsed = JSON.parse(trimmed);
+    if (Array.isArray(parsed)) {
+      if (!requireTimestamps || parsed.every(item => item && typeof item.time === 'number' && typeof item.text === 'string')) {
+        return parsed;
+      }
+      return null;
+    }
+  } catch (e) {
+    // fallback to plain text format
+  }
+
+  const lines = trimmed.split(/\r?\n/).map(line => line.trim()).filter(Boolean);
+  if (lines.length === 0) return [];
+
+  const parsed = [];
+  let currentTime = 0;
+  const timestampRegex = /(?:\[(\d{1,2}):(\d{2})(?:[\.:](\d{1,2}))?\])|(\d{1,2}):(\d{2})(?:[\.:](\d{1,2}))?/;
+
+  for (const line of lines) {
+    let time = null;
+    let textLine = line;
+    const match = line.match(timestampRegex);
+
+    if (match) {
+      const minutes = parseInt(match[1] ?? match[4], 10);
+      const seconds = parseInt(match[2] ?? match[5], 10);
+      const fraction = parseInt((match[3] ?? match[6] ?? '0').padEnd(2, '0'), 10);
+      time = minutes * 60 + seconds + fraction / 100;
+      textLine = line.replace(match[0], '').trim();
+    }
+
+    if (!textLine) continue;
+    if (time === null) {
+      if (requireTimestamps) return null;
+      time = currentTime;
+      currentTime += 5;
+    } else {
+      currentTime = time + 1;
+    }
+
+    parsed.push({ time, text: textLine });
+  }
+
+  return parsed;
+}
+
+function formatTime(seconds) {
+  const m = Math.floor(seconds / 60);
+  const s = Math.floor(seconds % 60);
+  return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+}
+
+function escapeHtml(text) {
+  return String(text)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+function updateLyricsPreview() {
+  const previewEl = document.getElementById('lyricsPreview');
+  const lyricsText = document.getElementById('uploadLyrics')?.value || '';
+  if (!previewEl) return;
+
+  const trimmed = lyricsText.trim();
+  if (!trimmed) {
+    previewEl.textContent = 'Lyrics preview will appear here after you type timestamped lines.';
+    previewEl.style.color = '#6a5d4a';
+    return;
+  }
+
+  const lines = trimmed.split(/\r?\n/).map(line => line.trim()).filter(Boolean);
+  if (lines.length === 0) {
+    previewEl.textContent = 'Lyrics preview will appear here after you type timestamped lines.';
+    previewEl.style.color = '#6a5d4a';
+    return;
+  }
+
+  const parsed = parseLyricsInput(trimmed, false);
+  if (!Array.isArray(parsed)) {
+    previewEl.innerHTML = '<span style="color:#f87171;">Invalid lyrics: every line must include a timestamp like [00:15].</span>';
+    return;
+  }
+
+  const html = parsed.map(item => `<div><strong>${formatTime(item.time)}</strong> ${escapeHtml(item.text)}</div>`).join('');
+  previewEl.innerHTML = html;
+  previewEl.style.color = '#4b5563';
+}
+
+const uploadLyricsInput = document.getElementById('uploadLyrics');
+if (uploadLyricsInput) {
+  uploadLyricsInput.addEventListener('input', updateLyricsPreview);
+}
+
+const uploadLyricsFileInput = document.getElementById('uploadLyricsFile');
+if (uploadLyricsFileInput) {
+  uploadLyricsFileInput.addEventListener('change', async (event) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    try {
+      const text = await file.text();
+      document.getElementById('uploadLyrics').value = text;
+      updateLyricsPreview();
+    } catch (e) {
+      console.error('Lyrics file read error:', e);
+      const statusEl = document.getElementById('uploadStatus');
+      if (statusEl) {
+        statusEl.textContent = '❌ Unable to read lyrics file. Please try a plain text file.';
+        statusEl.style.color = '#f87171';
+      }
+    }
+  });
 }
 
 async function loadMySongs() {
