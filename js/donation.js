@@ -31,29 +31,44 @@ function updateUnlockUI(songId, unlocked) {
   }
   
   const status = document.getElementById('songStatus');
-  status.textContent = unlocked ? '🔓 Unlocked' : '🔒 Locked';
-  status.className = `song-status ${unlocked ? 'status-unlocked' : 'status-locked'}`;
+  if (status) {
+    status.textContent = unlocked ? '🔓 Unlocked' : '🔒 Locked';
+    status.className = `song-status ${unlocked ? 'status-unlocked' : 'status-locked'}`;
+  }
   
   const btn = document.getElementById('donateBtn');
-  if (unlocked) {
-    btn.textContent = '✅ Already Unlocked';
-    btn.disabled = true;
-    btn.style.opacity = '0.5';
-    document.getElementById('donationMessage').innerHTML = 
-      `✅ <span style="color:#4ade80;">Permanent Access Unlocked!</span>`;
-  } else {
-    btn.textContent = '💖 Donate & Unlock';
-    btn.disabled = false;
-    btn.style.opacity = '1';
-    const song = window.state.songs.find(s => s._id === songId);
-    document.getElementById('donationMessage').innerHTML = 
-      `❤️ Support <span id="donationSongName">${song?.title || 'this song'}</span>`;
+  const donationMessage = document.getElementById('donationMessage');
+  if (btn) {
+    if (unlocked) {
+      btn.textContent = '✅ Already Unlocked';
+      btn.disabled = true;
+      btn.style.opacity = '0.5';
+    } else {
+      btn.textContent = '💖 Donate & Unlock';
+      btn.disabled = false;
+      btn.style.opacity = '1';
+    }
+  }
+  
+  if (donationMessage) {
+    if (unlocked) {
+      donationMessage.innerHTML = `✅ <span style="color:#4ade80;">Permanent Access Unlocked!</span>`;
+    } else {
+      const song = window.state.songs.find(s => s._id === songId);
+      donationMessage.innerHTML = `❤️ Support <span id="donationSongName">${song?.title || 'this song'}</span>`;
+    }
   }
 }
 
 function setupDonation() {
   const amountBtns = document.querySelectorAll('#donationAmounts button');
   const customInput = document.getElementById('customAmount');
+  const donateBtn = document.getElementById('donateBtn');
+  const donorEmail = document.getElementById('donorEmail');
+
+  if (!amountBtns.length || !customInput || !donateBtn || !donorEmail) {
+    return;
+  }
   
   amountBtns.forEach(btn => {
     btn.addEventListener('click', function() {
@@ -82,10 +97,10 @@ function setupDonation() {
   
   const savedEmail = localStorage.getItem(CONFIG.EMAIL_KEY);
   if (savedEmail) {
-    document.getElementById('donorEmail').value = savedEmail;
+    donorEmail.value = savedEmail;
   }
   
-  document.getElementById('donateBtn').addEventListener('click', handleDonate);
+  donateBtn.addEventListener('click', handleDonate);
 }
 
 async function handleDonate() {
@@ -141,7 +156,8 @@ async function verifyPayment() {
   const params = new URLSearchParams(window.location.search);
   const ref = params.get('reference') || params.get('trxref');
   const songId = params.get('songId') || window.state.currentSongId;
-  
+  const donateStatus = document.getElementById('donateStatus');
+
   if (ref) {
     try {
       const data = await apiFetch('/donation/verify', {
@@ -155,10 +171,11 @@ async function verifyPayment() {
         if (songId) {
           updateUnlockUI(songId, true);
         }
-        document.getElementById('donateStatus').textContent = '🎉 Thank you! Song unlocked!';
-        document.getElementById('donateStatus').style.color = '#4ade80';
+        if (donateStatus) {
+          donateStatus.textContent = '🎉 Thank you! Song unlocked!';
+          donateStatus.style.color = '#4ade80';
+        }
         
-        // Play full song
         playSong();
         
         window.history.replaceState({}, document.title, window.location.pathname);
@@ -171,31 +188,37 @@ async function verifyPayment() {
 
 // Setup share buttons
 function setupShareButtons() {
-  document.getElementById('shareWhatsAppBtn').addEventListener('click', () => {
-    const song = window.state.songs.find(s => s._id === window.state.currentSongId);
-    const msg = encodeURIComponent(
-      `🎵 Listen to "${song?.title || 'this song'}" by ${song?.artist || 'artist'}!\n` +
-      `🔗 ${CONFIG.APP_URL}\n` +
-      `❤️ Support the ministry!`
-    );
-    window.open(`https://api.whatsapp.com/send?text=${msg}`, '_blank');
-  });
-  
-  document.getElementById('copyLinkBtn').addEventListener('click', () => {
-    if (navigator.clipboard?.writeText) {
-      navigator.clipboard.writeText(CONFIG.APP_URL).then(() => {
+  const whatsappBtn = document.getElementById('shareWhatsAppBtn');
+  const copyBtn = document.getElementById('copyLinkBtn');
+  if (whatsappBtn) {
+    whatsappBtn.addEventListener('click', () => {
+      const song = window.state.songs.find(s => s._id === window.state.currentSongId);
+      const msg = encodeURIComponent(
+        `🎵 Listen to "${song?.title || 'this song'}" by ${song?.artist || 'artist'}!\n` +
+        `🔗 ${CONFIG.APP_URL}\n` +
+        `❤️ Support the ministry!`
+      );
+      window.open(`https://api.whatsapp.com/send?text=${msg}`, '_blank');
+    });
+  }
+
+  if (copyBtn) {
+    copyBtn.addEventListener('click', () => {
+      if (navigator.clipboard?.writeText) {
+        navigator.clipboard.writeText(CONFIG.APP_URL).then(() => {
+          showCopySuccess();
+        });
+      } else {
+        const input = document.createElement('input');
+        input.value = CONFIG.APP_URL;
+        document.body.appendChild(input);
+        input.select();
+        document.execCommand('copy');
+        document.body.removeChild(input);
         showCopySuccess();
-      });
-    } else {
-      const input = document.createElement('input');
-      input.value = CONFIG.APP_URL;
-      document.body.appendChild(input);
-      input.select();
-      document.execCommand('copy');
-      document.body.removeChild(input);
-      showCopySuccess();
-    }
-  });
+      }
+    });
+  }
 }
 
 function showCopySuccess() {

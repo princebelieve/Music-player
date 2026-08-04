@@ -14,31 +14,33 @@ window.state = {
 
 // Initialize app
 document.addEventListener('DOMContentLoaded', async () => {
-  // Setup audio controls
-  setupAudioControls();
+  if (document.getElementById('audioPlayer')) {
+    setupAudioControls();
+  }
 
-  // Wire search UI
-  setupSearchControls();
+  if (document.getElementById('searchInput')) {
+    setupSearchControls();
+  }
   
-  // Check auth
   if (window.state.token) {
     await verifyToken();
   }
   
-  // Load songs
-  await loadSongs();
+  if (document.getElementById('songGrid') || document.getElementById('audioPlayer')) {
+    await loadSongs();
+  }
   
-  // Setup donation
-  setupDonation();
+  if (document.getElementById('donateBtn')) {
+    setupDonation();
+  }
   
-  // Setup particles
-  setupParticles();
+  if (document.getElementById('shareWhatsAppBtn')) {
+    setupShareButtons();
+  }
   
-  // Setup share buttons
-  setupShareButtons();
-  
-  // Check payment verification
-  await verifyPayment();
+  if (window.location.search.includes('reference') || window.location.search.includes('trxref')) {
+    await verifyPayment();
+  }
   
   console.log('🎵 Gospel Music Platform loaded!');
   console.log(`📚 ${window.state.songs.length} songs loaded`);

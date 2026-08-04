@@ -6,29 +6,34 @@ let audio = document.getElementById('audioPlayer');
 let isPlaying = false;
 
 function setupAudioControls() {
+  if (!audio) return;
+
   const playBtn = document.getElementById('playBtn');
   const progressBar = document.getElementById('progressBar');
   const timeDisplay = document.getElementById('timeDisplay');
   const volumeSlider = document.getElementById('volumeSlider');
   
-  audio.addEventListener('loadedmetadata', updateTimeDisplay);
+  if (audio) {
+    audio.addEventListener('loadedmetadata', updateTimeDisplay);
+  }
   
   audio.addEventListener('timeupdate', () => {
     updateTimeDisplay();
     
-    // Update lyrics if unlocked
     const song = window.state.songs.find(s => s._id === window.state.currentSongId);
     if (song && song.lyrics && window.state.unlocked) {
       renderLyrics(song.lyrics, audio.currentTime);
     }
     
-    // Preview limit
     const songData = window.state.songs.find(s => s._id === window.state.currentSongId);
     if (songData && !window.state.unlocked && audio.currentTime >= (songData.previewDuration || 30)) {
       audio.pause();
       playBtn.textContent = '▶';
       playBtn.classList.remove('playing');
-      document.getElementById('donationSection').scrollIntoView({ behavior: 'smooth' });
+      const donationSection = document.getElementById('donationSection');
+      if (donationSection) {
+        donationSection.scrollIntoView({ behavior: 'smooth' });
+      }
       
       document.getElementById('donationMessage').innerHTML =
         '❤️ <span>Preview complete. Donate to unlock the full song!</span>';
@@ -52,15 +57,19 @@ function setupAudioControls() {
     }
   });
   
-  progressBar.addEventListener('input', (e) => {
-    if (audio.duration) {
-      audio.currentTime = (e.target.value / 100) * audio.duration;
-    }
-  });
+  if (progressBar) {
+    progressBar.addEventListener('input', (e) => {
+      if (audio.duration) {
+        audio.currentTime = (e.target.value / 100) * audio.duration;
+      }
+    });
+  }
   
-  volumeSlider.addEventListener('input', (e) => {
-    audio.volume = e.target.value / 100;
-  });
+  if (volumeSlider) {
+    volumeSlider.addEventListener('input', (e) => {
+      audio.volume = e.target.value / 100;
+    });
+  }
   
   audio.addEventListener('ended', () => {
     playBtn.textContent = '▶';
@@ -70,12 +79,16 @@ function setupAudioControls() {
 }
 
 function updateTimeDisplay() {
+  if (!audio) return;
   const current = audio.currentTime || 0;
   const duration = audio.duration || 0;
-  document.getElementById('timeDisplay').textContent = 
-    `${formatTime(current)} / ${formatTime(duration)}`;
-  if (duration > 0) {
-    document.getElementById('progressBar').value = (current / duration) * 100;
+  const timeDisplay = document.getElementById('timeDisplay');
+  if (timeDisplay) {
+    timeDisplay.textContent = `${formatTime(current)} / ${formatTime(duration)}`;
+  }
+  const progressBar = document.getElementById('progressBar');
+  if (duration > 0 && progressBar) {
+    progressBar.value = (current / duration) * 100;
   }
 }
 

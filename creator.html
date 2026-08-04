@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Creator Dashboard | Abanabame</title>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body class="mobile-nav-padding">
+  <canvas id="particleCanvas"></canvas>
+  <div id="app" class="app-shell">
+    <aside class="side-rail left-rail">
+      <div class="rail-brand">🎵 ABANABAME</div>
+      <nav class="rail-nav">
+        <a class="rail-btn" href="index.html">Home</a>
+        <a class="rail-btn" href="trending.html">Trending</a>
+        <a class="rail-btn" href="discover.html">Discover</a>
+        <a class="rail-btn" href="library.html">Library</a>
+        <a class="rail-btn active" href="creator.html">Creator</a>
+      </nav>
+    </aside>
+
+    <main class="main-column">
+      <header class="app-header">
+        <div class="app-logo">🎤 Creator Dashboard</div>
+        <div class="header-actions">
+          <button class="btn" onclick="window.showAuthModal()">Sign In</button>
+          <div id="userMenu" style="display:none;" class="user-menu">
+            <span class="user-name" id="userNameDisplay">User</span>
+            <div class="user-avatar" id="userAvatar"><span id="avatarText">U</span></div>
+            <button class="btn btn-danger" onclick="window.logout()">Logout</button>
+          </div>
+        </div>
+      </header>
+
+      <div class="mobile-pill-bar">
+        <a href="index.html" class="pill-chip">Home</a>
+        <a href="trending.html" class="pill-chip">Trending</a>
+        <a href="discover.html" class="pill-chip">Discover</a>
+        <a href="library.html" class="pill-chip">Library</a>
+        <a href="creator.html" class="pill-chip active">Creator</a>
+      </div>
+
+      <section class="content-grid" style="padding:24px 0;">
+        <div class="creator-dashboard" id="creatorDashboard" style="width:100%;display:block;">
+          <h3>📤 Creator Tools</h3>
+          <div id="creatorDashboardMessage" style="color:#6a5d4a;font-size:0.95rem;margin-bottom:16px;">Sign in to submit songs or request creator access.</div>
+          <button class="upload-btn" id="uploadSongBtn" onclick="window.showUploadModal()" style="display:none;">Upload New Song</button>
+
+          <div id="mySongsList" style="margin-top:16px;"></div>
+          <div id="creatorRequestContainer" style="margin-top:16px;">
+            <button class="btn btn-primary" onclick="window.showCreatorRequestModal()">Request Creator Access</button>
+          </div>
+        </div>
+      </section>
+
+      <nav class="mobile-bottom-nav">
+        <a href="index.html" class="mobile-nav-item">Home</a>
+        <a href="discover.html" class="mobile-nav-item">Discover</a>
+        <button class="mobile-nav-center" onclick="window.showUploadModal()">＋</button>
+        <a href="library.html" class="mobile-nav-item">Library</a>
+        <a href="creator.html" class="mobile-nav-item active">Creator</a>
+      </nav>
+    </main>
+
+    <aside class="side-rail right-rail">
+      <div class="rail-card"><h4>Creator status</h4><p>Use this page to submit songs, view pending uploads, and manage your creator account.</p></div>
+    </aside>
+
+    <div class="modal" id="authModal">
+      <div class="modal-content">
+        <span class="close-btn" onclick="window.closeAuthModal()">✕</span>
+        <h2 id="authTitle">Sign In</h2>
+        <button class="google-btn" onclick="window.loginWithGoogle()">
+          <span style="font-size:1.2rem;font-weight:700;">G</span> Continue with Google
+        </button>
+        <div class="divider">or</div>
+        <input type="email" id="authEmail" placeholder="Email" required>
+        <input type="text" id="authName" placeholder="Full Name" style="display:none;">
+        <input type="password" id="authPassword" placeholder="Password" required>
+        <button class="btn btn-primary" style="width:100%;padding:12px;font-size:1rem;margin-top:10px;" onclick="window.handleAuth()" id="authSubmitBtn">Sign In</button>
+        <div class="auth-switch">
+          <span id="authSwitchText">Don't have an account?</span>
+          <a href="#" onclick="window.toggleAuthMode()">Sign Up</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal" id="creatorRequestModal">
+      <div class="modal-content">
+        <span class="close-btn" onclick="window.closeCreatorRequestModal()">✕</span>
+        <h2>🎤 Apply as Creator</h2>
+        <p style="color:#6a5d4a; font-size:0.9rem; margin-bottom:10px;">Submit a request and an admin will approve your creator status.</p>
+        <input type="text" id="creatorName" placeholder="Your full name *">
+        <input type="email" id="creatorEmail" placeholder="Email address *">
+        <input type="text" id="creatorStageName" placeholder="Stage name / artist name *">
+        <textarea id="creatorBio" placeholder="Tell us a little about your ministry or brand"></textarea>
+        <button class="btn btn-primary" style="width:100%;padding:12px;font-size:1rem;margin-top:10px;" onclick="window.submitCreatorRequest()">Submit Creator Request</button>
+        <div id="creatorRequestStatus" style="text-align:center;margin-top:8px;font-size:0.85rem;color:#8a7d6a;"></div>
+      </div>
+    </div>
+
+    <div class="modal" id="uploadModal">
+      <div class="modal-content">
+        <span class="close-btn" onclick="window.closeUploadModal()">✕</span>
+        <h2>📤 Upload Song</h2>
+        <input type="text" id="uploadTitle" placeholder="Song Title *">
+        <input type="text" id="uploadArtist" placeholder="Artist Name *">
+        <input type="number" id="uploadPreview" placeholder="Preview Duration (seconds)" value="30">
+        <label style="color:#6a5d4a;font-size:0.85rem;display:block;margin-top:8px;">Audio File (MP3)</label>
+        <input type="file" id="uploadAudio" accept="audio/*">
+        <label style="color:#6a5d4a;font-size:0.85rem;display:block;margin-top:8px;">Cover Image</label>
+        <input type="file" id="uploadCover" accept="image/*">
+        <label style="color:#6a5d4a;font-size:0.85rem;display:block;margin-top:8px;">Lyrics (optional — if provided, every line must include a timestamp)</label>
+        <input type="file" id="uploadLyricsFile" accept=".txt,.lrc,text/plain" style="margin-bottom:10px;" />
+        <textarea id="uploadLyrics" placeholder="Paste timestamped lyrics here, e.g. [00:15] First line"></textarea>
+        <div id="lyricsPreview" style="min-height:4rem;color:#6a5d4a;font-size:0.85rem;white-space:pre-wrap;margin-top:8px;border:1px solid #e5e7eb;padding:10px;border-radius:6px;background:#fafaf9;">Lyrics preview will appear here after you type timestamped lines.</div>
+        <button id="uploadSubmitBtn" class="btn btn-primary" style="width:100%;padding:12px;font-size:1rem;margin-top:10px;" onclick="window.submitUpload()">Submit for Review</button>
+        <div id="uploadStatus" style="text-align:center;margin-top:8px;font-size:0.85rem;color:#8a7d6a;"></div>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/config.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/upload.js"></script>
+  <script src="js/app.js"></script>
+  <script src="js/particles.js"></script>
+</body>
+</html>

@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Player | Abanabame</title>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body class="mobile-nav-padding">
+  <canvas id="particleCanvas"></canvas>
+  <div id="app" class="app-shell">
+    <aside class="side-rail left-rail">
+      <div class="rail-brand">🎵 ABANABAME</div>
+      <nav class="rail-nav">
+        <a class="rail-btn" href="index.html">Home</a>
+        <a class="rail-btn" href="trending.html">Trending</a>
+        <a class="rail-btn" href="discover.html">Discover</a>
+        <a class="rail-btn" href="library.html">Library</a>
+        <a class="rail-btn" href="creator.html">Creator</a>
+      </nav>
+    </aside>
+
+    <main class="main-column">
+      <header class="app-header">
+        <div class="app-logo">🎧 Player</div>
+        <div class="header-actions">
+          <button class="btn" onclick="window.showAuthModal()">Sign In</button>
+          <div id="userMenu" style="display:none;" class="user-menu">
+            <span class="user-name" id="userNameDisplay">User</span>
+            <div class="user-avatar" id="userAvatar"><span id="avatarText">U</span></div>
+            <button class="btn btn-danger" onclick="window.logout()">Logout</button>
+          </div>
+        </div>
+      </header>
+
+      <div class="mobile-pill-bar">
+        <a href="index.html" class="pill-chip">Home</a>
+        <a href="trending.html" class="pill-chip">Trending</a>
+        <a href="discover.html" class="pill-chip">Discover</a>
+        <a href="library.html" class="pill-chip">Library</a>
+        <a href="creator.html" class="pill-chip">Creator</a>
+      </div>
+
+      <div class="player-card">
+        <div class="song-header">
+          <img class="song-cover" id="currentCover" src="" alt="Cover">
+          <div class="song-info">
+            <div class="song-title" id="currentTitle">Select a song</div>
+            <div class="song-artist" id="currentArtist">No song selected</div>
+            <span class="song-status status-locked" id="songStatus">🔒 Locked</span>
+          </div>
+        </div>
+
+        <div class="lyric-box">
+          <div id="lyricsDisplay">Lyrics appear here when a song is selected.</div>
+        </div>
+
+        <div class="audio-controls">
+          <button class="play-btn" id="playBtn">▶</button>
+          <span class="time-display" id="timeDisplay">0:00 / 0:00</span>
+          <input type="range" class="progress-bar" id="progressBar" min="0" max="100" value="0">
+          <input type="range" class="volume-slider" id="volumeSlider" min="0" max="100" value="80">
+        </div>
+      </div>
+
+      <div class="content-grid" style="width:100%;padding:24px 0;">
+        <h3>🎵 Song Library</h3>
+        <div class="song-grid" id="songGrid">
+          <div class="loading">Loading songs...</div>
+        </div>
+      </div>
+
+      <nav class="mobile-bottom-nav">
+        <a href="index.html" class="mobile-nav-item">Home</a>
+        <a href="discover.html" class="mobile-nav-item">Discover</a>
+        <button class="mobile-nav-center" onclick="window.location.href='upload.html'">＋</button>
+        <a href="library.html" class="mobile-nav-item">Library</a>
+        <a href="creator.html" class="mobile-nav-item">Creator</a>
+      </nav>
+    </main>
+
+    <aside class="side-rail right-rail">
+      <div class="rail-card"><h4>Now Playing</h4><p>Play any song from the library and unlock it via donation.</p></div>
+    </aside>
+
+    <div class="modal" id="authModal">
+      <div class="modal-content">
+        <span class="close-btn" onclick="window.closeAuthModal()">✕</span>
+        <h2 id="authTitle">Sign In</h2>
+        <button class="google-btn" onclick="window.loginWithGoogle()">
+          <span style="font-size:1.2rem;font-weight:700;">G</span> Continue with Google
+        </button>
+        <div class="divider">or</div>
+        <input type="email" id="authEmail" placeholder="Email" required>
+        <input type="text" id="authName" placeholder="Full Name" style="display:none;">
+        <input type="password" id="authPassword" placeholder="Password" required>
+        <button class="btn btn-primary" style="width:100%;padding:12px;font-size:1rem;margin-top:10px;" onclick="window.handleAuth()" id="authSubmitBtn">Sign In</button>
+        <div class="auth-switch">
+          <span id="authSwitchText">Don't have an account?</span>
+          <a href="#" onclick="window.toggleAuthMode()">Sign Up</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/config.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/player.js"></script>
+  <script src="js/songs.js"></script>
+  <script src="js/donation.js"></script>
+  <script src="js/app.js"></script>
+  <script src="js/particles.js"></script>
+</body>
+</html>

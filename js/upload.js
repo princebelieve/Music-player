@@ -46,9 +46,9 @@ async function submitCreatorRequest() {
   statusEl.style.color = '#8a7d6a';
 
   try {
-    const data = await apiFetch('/admin/make-creator', {
+    const data = await apiFetch('/admin/creator-requests', {
       method: 'POST',
-      body: JSON.stringify({ email, name, stageName, bio })
+      body: JSON.stringify({ stageName, bio })
     });
 
     if (data.success) {
@@ -127,9 +127,15 @@ async function submitUpload() {
       body: formData
     });
 
-    const data = await response.json();
+    let data = null;
+    try {
+      data = await response.json();
+    } catch (jsonError) {
+      console.error('Upload response parse error:', jsonError);
+      data = null;
+    }
 
-    if (data.success) {
+    if (response.ok && data && data.success) {
       statusEl.textContent = '✅ ' + data.message;
       statusEl.style.color = '#4ade80';
 
@@ -148,7 +154,8 @@ async function submitUpload() {
         if (uploadBtn) uploadBtn.disabled = false;
       }, 2500);
     } else {
-      statusEl.textContent = '❌ ' + (data.error || `Upload failed (${response.status})`);
+      const message = data?.error || response.statusText || `Upload failed (${response.status})`;
+      statusEl.textContent = '❌ ' + message;
       statusEl.style.color = '#f87171';
       if (uploadBtn) uploadBtn.disabled = false;
     }

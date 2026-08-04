@@ -6,8 +6,9 @@ function setupSearchControls() {
   const searchInput = document.getElementById('searchInput');
   const searchBtn = document.getElementById('searchBtn');
   const clearSearchBtn = document.getElementById('clearSearchBtn');
+  const libraryGrid = document.getElementById('songGrid');
 
-  if (!searchInput || !searchBtn || !clearSearchBtn) return;
+  if (!searchInput || !searchBtn || !clearSearchBtn || !libraryGrid) return;
 
   searchBtn.addEventListener('click', async () => {
     const query = searchInput.value.trim();
@@ -92,11 +93,12 @@ async function loadSong(songId) {
   document.getElementById('currentCover').src = song.coverUrl;
   document.getElementById('donationSongName').textContent = song.title;
   
-  // Load audio
-  audio.src = song.audioUrl;
-  audio.load();
+  const audioPlayer = document.getElementById('audioPlayer');
+  if (audioPlayer) {
+    audioPlayer.src = song.audioUrl;
+    audioPlayer.load();
+  }
   
-  // Check unlock
   await checkUnlock(songId);
   
   // Update active card
