@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Library | Abanabame</title>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body class="mobile-nav-padding">
+  <canvas id="particleCanvas"></canvas>
+  <div id="app" class="app-shell">
+    <aside class="side-rail left-rail">
+      <div class="rail-brand">🎵 ABANABAME</div>
+      <nav class="rail-nav">
+        <a class="rail-btn" href="index.html">Home</a>
+        <a class="rail-btn" href="trending.html">Trending</a>
+        <a class="rail-btn" href="discover.html">Discover</a>
+        <a class="rail-btn active" href="library.html">Library</a>
+      </nav>
+    </aside>
+
+    <main class="main-column">
+      <header class="app-header">
+        <div class="app-logo">🎵 Library</div>
+        <div class="header-actions">
+          <a class="mobile-search-icon" href="#librarySearch" aria-label="Search music">⌕</a>
+          <button class="btn" onclick="window.location.href='index.html'">Back</button>
+        </div>
+      </header>
+
+      <div class="mobile-pill-bar">
+        <a href="index.html" class="pill-chip">Home</a>
+        <a href="trending.html" class="pill-chip">Trending</a>
+        <a href="discover.html" class="pill-chip">Discover</a>
+        <a href="library.html" class="pill-chip active">Library</a>
+      </div>
+
+      <div class="mobile-library-search" id="librarySearch">
+        <span class="search-icon">⌕</span>
+        <input id="searchInput" type="text" placeholder="Search songs, artist, or tag">
+        <button class="btn" id="searchBtn">Search</button>
+        <button class="btn" id="clearSearchBtn">Clear</button>
+      </div>
+
+      <div class="player-card">
+        <h3>📚 Your library</h3>
+        <p style="color:#8a7d6a; margin-top:10px;">This page is reserved for saved songs, downloads, playlists, and your personal collection.</p>
+      </div>
+
+      <nav class="mobile-bottom-nav">
+        <a href="index.html" class="mobile-nav-item">Home</a>
+        <a href="discover.html" class="mobile-nav-item">Discover</a>
+        <button class="mobile-nav-center" onclick="window.location.href='index.html#uploadModal'">＋</button>
+        <a href="library.html" class="mobile-nav-item active">Library</a>
+        <a href="profile.html" class="mobile-nav-item">Profile</a>
+      </nav>
+    </main>
+
+    <aside class="side-rail right-rail">
+      <div class="rail-card"><h4>Saved items</h4><p>Favorites, playlists, and purchased songs can sit here.</p></div>
+    </aside>
+  </div>
+
+  <script src="js/particles.js"></script>
+</body>
+</html>

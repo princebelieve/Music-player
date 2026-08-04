@@ -25,14 +25,17 @@
     <aside class="side-rail left-rail">
       <div class="rail-brand">🎵 ABANABAME</div>
       <nav class="rail-nav">
-        <button class="rail-btn active">Home</button>
-        <button class="rail-btn">Trending</button>
-        <button class="rail-btn">Library</button>
-        <button class="rail-btn">Discover</button>
+        <a class="rail-btn active" href="index.html">Home</a>
+        <a class="rail-btn" href="trending.html">Trending</a>
+        <a class="rail-btn" href="library.html">Library</a>
+        <a class="rail-btn" href="discover.html">Discover</a>
       </nav>
-      <div class="rail-card">
-        <h4>Creator Access</h4>
-        <p>Upload your songs and grow your ministry presence.</p>
+
+      <div class="creator-dashboard" id="creatorDashboard" style="display:block;">
+        <h3>🎵 Creator Dashboard</h3>
+        <div id="creatorDashboardMessage" style="color:#6a5d4a;font-size:0.9rem;margin-bottom:10px;">Upload a song to begin. If you are not a creator yet, you will be guided to register as one.</div>
+        <button class="upload-btn" id="uploadSongBtn" onclick="window.showUploadModal()">📤 Upload New Song</button>
+        <div id="mySongsList" style="margin-top:10px;"></div>
       </div>
     </aside>
 
@@ -40,6 +43,13 @@
       <header class="app-header">
         <div class="app-logo">🎵 Gospel Music</div>
         <div class="header-actions">
+          <a class="mobile-search-icon" href="library.html#librarySearch" aria-label="Search music">⌕</a>
+          <div class="global-search-bar" role="search">
+            <span class="search-icon">⌕</span>
+            <input id="searchInput" type="text" placeholder="Search songs, artist, or tag">
+            <button class="btn" id="searchBtn">Search</button>
+            <button class="btn" id="clearSearchBtn">Clear</button>
+          </div>
           <button class="btn" id="authBtn" onclick="window.showAuthModal()">Sign In</button>
           <div id="userMenu" style="display:none;" class="user-menu">
             <span class="user-name" id="userNameDisplay">User</span>
@@ -48,6 +58,13 @@
           </div>
         </div>
       </header>
+
+      <div class="mobile-pill-bar">
+        <a href="index.html" class="pill-chip active">Home</a>
+        <a href="trending.html" class="pill-chip">Trending</a>
+        <a href="discover.html" class="pill-chip">Discover</a>
+        <a href="library.html" class="pill-chip">Library</a>
+      </div>
 
       <div class="player-card">
         <div class="song-header">
@@ -74,11 +91,6 @@
       <div class="content-grid">
         <div class="library-section">
           <h3>📚 SONG LIBRARY</h3>
-          <div class="search-bar" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;">
-            <input id="searchInput" type="text" placeholder="Search songs, artist, or tag" style="flex:1;min-width:220px;">
-            <button class="btn" id="searchBtn">Search</button>
-            <button class="btn" id="clearSearchBtn">Clear</button>
-          </div>
           <div class="song-grid" id="songGrid">
             <div class="loading">Loading songs...</div>
           </div>
@@ -109,13 +121,6 @@
             </div>
           </div>
 
-          <div class="creator-dashboard" id="creatorDashboard" style="display:block;">
-            <h3>🎵 Creator Dashboard</h3>
-            <div id="creatorDashboardMessage" style="color:#6a5d4a;font-size:0.9rem;margin-bottom:10px;">Upload a song to begin. If you are not a creator yet, you will be guided to register as one.</div>
-            <button class="upload-btn" id="uploadSongBtn" onclick="window.showUploadModal()">📤 Upload New Song</button>
-            <div id="mySongsList" style="margin-top:10px;"></div>
-          </div>
-
           <div class="creator-dashboard" id="adminDashboard" style="display:none;">
             <h3>👑 Admin Dashboard</h3>
             <div id="adminStats" style="color:#6a5d4a;font-size:0.9rem;">Admin tools are available once you sign in as an admin.</div>
@@ -123,6 +128,14 @@
           </div>
         </div>
       </div>
+
+      <nav class="mobile-bottom-nav">
+        <a href="index.html" class="mobile-nav-item active">Home</a>
+        <a href="discover.html" class="mobile-nav-item">Discover</a>
+        <button class="mobile-nav-center" onclick="window.showUploadModal()">＋</button>
+        <a href="library.html" class="mobile-nav-item">Library</a>
+        <a href="profile.html" class="mobile-nav-item">Profile</a>
+      </nav>
     </main>
 
     <aside class="side-rail right-rail">

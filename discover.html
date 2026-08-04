@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Discover | Abanabame</title>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body class="mobile-nav-padding">
+  <canvas id="particleCanvas"></canvas>
+  <div id="app" class="app-shell">
+    <aside class="side-rail left-rail">
+      <div class="rail-brand">🎵 ABANABAME</div>
+      <nav class="rail-nav">
+        <a class="rail-btn" href="index.html">Home</a>
+        <a class="rail-btn" href="trending.html">Trending</a>
+        <a class="rail-btn active" href="discover.html">Discover</a>
+        <a class="rail-btn" href="library.html">Library</a>
+      </nav>
+    </aside>
+
+    <main class="main-column">
+      <header class="app-header">
+        <div class="app-logo">🎵 Discover</div>
+        <div class="header-actions">
+          <button class="btn" onclick="window.location.href='index.html'">Back</button>
+        </div>
+      </header>
+
+      <div class="mobile-pill-bar">
+        <a href="index.html" class="pill-chip">Home</a>
+        <a href="trending.html" class="pill-chip">Trending</a>
+        <a href="discover.html" class="pill-chip active">Discover</a>
+        <a href="library.html" class="pill-chip">Library</a>
+      </div>
+
+      <div class="player-card">
+        <h3>🔎 Discover artists</h3>
+        <p style="color:#8a7d6a; margin-top:10px;">Use this page for artist discovery, new drops, and community curation workflows.</p>
+      </div>
+
+      <nav class="mobile-bottom-nav">
+        <a href="index.html" class="mobile-nav-item">Home</a>
+        <a href="discover.html" class="mobile-nav-item active">Discover</a>
+        <button class="mobile-nav-center" onclick="window.location.href='index.html#uploadModal'">＋</button>
+        <a href="library.html" class="mobile-nav-item">Library</a>
+        <a href="profile.html" class="mobile-nav-item">Profile</a>
+      </nav>
+    </main>
+
+    <aside class="side-rail right-rail">
+      <div class="rail-card"><h4>Discovery feed</h4><p>Show new artist spots, featured genres, and recommended uploads here.</p></div>
+    </aside>
+  </div>
+
+  <script src="js/particles.js"></script>
+</body>
+</html>
