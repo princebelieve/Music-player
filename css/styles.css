@@ -304,18 +304,19 @@ body.mobile-nav-padding {
 }
 
 .btn {
-  background: rgba(255, 200, 120, 0.1);
-  border: 1px solid rgba(255, 200, 120, 0.2);
-  color: #f0e0c0;
-  padding: 6px 14px;
+  background: rgba(245, 184, 126, 0.18);
+  border: 1px solid rgba(245, 184, 126, 0.35);
+  color: #0a0a12;
+  padding: 10px 16px;
   border-radius: 30px;
   cursor: pointer;
-  font-size: 0.8rem;
+  font-size: 0.9rem;
+  font-weight: 600;
   transition: all 0.25s ease;
 }
 
 .btn:hover {
-  background: rgba(255, 200, 120, 0.22);
+  background: rgba(245, 184, 126, 0.35);
   transform: translateY(-1px);
 }
 
@@ -323,7 +324,7 @@ body.mobile-nav-padding {
   background: linear-gradient(135deg, #f5b87e, #d4945a);
   color: #0a0a12;
   border: none;
-  font-weight: 600;
+  font-weight: 700;
 }
 
 .btn-danger {
@@ -864,11 +865,11 @@ body.mobile-nav-padding {
 
 .google-btn {
   width: 100%;
-  padding: 10px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
   border-radius: 12px;
-  background: rgba(255, 255, 255, 0.05);
-  color: #f0e0c0;
+  background: rgba(255, 255, 255, 0.22);
+  color: #0a0a12;
   font-size: 0.95rem;
   cursor: pointer;
   display: flex;
@@ -879,7 +880,7 @@ body.mobile-nav-padding {
 }
 
 .google-btn:hover {
-  background: rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.35);
 }
 
 .auth-switch {

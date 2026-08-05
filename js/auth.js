@@ -10,8 +10,10 @@ async function verifyToken() {
       showUserUI(data.user);
       return true;
     }
+    localStorage.removeItem(CONFIG.STORAGE_KEY);
     return false;
   } catch (e) {
+    localStorage.removeItem(CONFIG.STORAGE_KEY);
     return false;
   }
 }
@@ -305,7 +307,7 @@ function togglePasswordVisibility() {
 }
 
 async function showForgotPassword() {
-  window.location.href = 'reset-password.html';
+  window.location.href = 'forgot-password.html';
 }
 
 async function handleAuth() {
@@ -391,16 +393,32 @@ function handleGoogleCredential(response) {
   });
 }
 
+let googleInitAttempts = 0;
+let googleLoginReady = false;
 function initGoogleLogin() {
-  if (!CONFIG.GOOGLE_CLIENT_ID || !window.google || !window.google.accounts || !window.google.accounts.id) {
-    return;
-  }
+  if (!CONFIG.GOOGLE_CLIENT_ID) return;
 
-  window.google.accounts.id.initialize({
-    client_id: CONFIG.GOOGLE_CLIENT_ID,
-    callback: handleGoogleCredential,
-    cancel_on_tap_outside: true
-  });
+  const tryInit = () => {
+    if (window.google && window.google.accounts && window.google.accounts.id) {
+      window.google.accounts.id.initialize({
+        client_id: CONFIG.GOOGLE_CLIENT_ID,
+        callback: handleGoogleCredential,
+        cancel_on_tap_outside: true
+      });
+      googleLoginReady = true;
+      return;
+    }
+
+    googleInitAttempts += 1;
+    if (googleInitAttempts < 50) {
+      setTimeout(tryInit, 200);
+    } else {
+      googleLoginReady = false;
+      console.warn('Google Identity Services failed to initialize.');
+    }
+  };
+
+  tryInit();
 }
 
 function loginWithGoogle() {
@@ -409,10 +427,15 @@ function loginWithGoogle() {
     return;
   }
 
-  if (window.google && window.google.accounts && window.google.accounts.id) {
-    window.google.accounts.id.prompt();
+  if (googleLoginReady && window.google && window.google.accounts && window.google.accounts.id) {
+    try {
+      window.google.accounts.id.prompt();
+    } catch (err) {
+      setAuthStatus('❌ Google login failed to open. Please reload the page.', '#f87171');
+      console.error('Google prompt error:', err);
+    }
   } else {
-    alert('Google login is not ready yet. Please reload the page.');
+    setAuthStatus('❌ Google login is not ready yet. Please reload the page.', '#f87171');
   }
 }
 
