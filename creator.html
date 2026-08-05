@@ -78,11 +78,19 @@
         <input type="email" id="authEmail" placeholder="Email" required>
         <input type="text" id="authName" placeholder="Full Name" style="display:none;">
         <input type="password" id="authPassword" placeholder="Password" required>
+        <input type="password" id="authConfirmPassword" placeholder="Confirm Password" style="display:none; margin-top:10px;">
+        <label class="show-password-label" style="display:flex;align-items:center;gap:8px;margin-top:10px; color:#c3bfd0; font-size:0.85rem;">
+          <input type="checkbox" id="authShowPassword"> Show password
+        </label>
+        <div id="authForgotLink" style="margin-top:10px;text-align:right;">
+          <a href="#" onclick="window.showForgotPassword(); return false;">Forgot password?</a>
+        </div>
         <button class="btn btn-primary" style="width:100%;padding:12px;font-size:1rem;margin-top:10px;" onclick="window.handleAuth()" id="authSubmitBtn">Sign In</button>
         <div class="auth-switch">
           <span id="authSwitchText">Don't have an account?</span>
-          <a href="#" onclick="window.toggleAuthMode()">Sign Up</a>
+          <a href="#" id="authSwitchLink" onclick="window.toggleAuthMode()">Sign Up</a>
         </div>
+        <div id="authStatus" style="color:#f5c88a; margin-top:12px; font-size:0.9rem;"></div>
       </div>
     </div>
 
@@ -121,6 +129,7 @@
     </div>
   </div>
 
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
   <script src="js/config.js"></script>
   <script src="js/api.js"></script>
   <script src="js/auth.js"></script>

@@ -255,65 +255,165 @@ async function promoteUserToAdmin(email) {
 }
 
 function showAuthModal() {
+  updateAuthForm(false);
+  setAuthStatus('');
   document.getElementById('authModal').classList.add('show');
-  document.getElementById('authTitle').textContent = 'Sign In';
-  document.getElementById('authName').style.display = 'none';
-  document.getElementById('authSubmitBtn').textContent = 'Sign In';
-  document.getElementById('authSwitchText').textContent = "Don't have an account?";
 }
 
 function closeAuthModal() {
   document.getElementById('authModal').classList.remove('show');
 }
 
+function updateAuthForm(isSignup) {
+  const title = document.getElementById('authTitle');
+  const authName = document.getElementById('authName');
+  const authConfirmPassword = document.getElementById('authConfirmPassword');
+  const authForgotLink = document.getElementById('authForgotLink');
+  const authSubmitBtn = document.getElementById('authSubmitBtn');
+  const authSwitchText = document.getElementById('authSwitchText');
+  const authSwitchLink = document.getElementById('authSwitchLink');
+
+  if (title) title.textContent = isSignup ? 'Sign Up' : 'Sign In';
+  if (authName) authName.style.display = isSignup ? 'block' : 'none';
+  if (authConfirmPassword) authConfirmPassword.style.display = isSignup ? 'block' : 'none';
+  if (authForgotLink) authForgotLink.style.display = isSignup ? 'none' : 'block';
+  if (authSubmitBtn) authSubmitBtn.textContent = isSignup ? 'Sign Up' : 'Sign In';
+  if (authSwitchText) authSwitchText.textContent = isSignup ? 'Already have an account?' : "Don't have an account?";
+  if (authSwitchLink) authSwitchLink.textContent = isSignup ? 'Sign In' : 'Sign Up';
+}
+
 function toggleAuthMode() {
   const isSignup = document.getElementById('authTitle').textContent === 'Sign Up';
-  document.getElementById('authTitle').textContent = isSignup ? 'Sign In' : 'Sign Up';
-  document.getElementById('authName').style.display = isSignup ? 'none' : 'block';
-  document.getElementById('authSubmitBtn').textContent = isSignup ? 'Sign In' : 'Sign Up';
-  document.getElementById('authSwitchText').textContent = isSignup ? "Don't have an account?" : 'Already have an account?';
+  updateAuthForm(!isSignup);
+  setAuthStatus('');
+}
+
+function setAuthStatus(message, color = '#f5c88a') {
+  const status = document.getElementById('authStatus');
+  if (status) {
+    status.textContent = message;
+    status.style.color = color;
+  }
+}
+
+function togglePasswordVisibility() {
+  const show = document.getElementById('authShowPassword')?.checked;
+  const passwordField = document.getElementById('authPassword');
+  const confirmPasswordField = document.getElementById('authConfirmPassword');
+  if (passwordField) passwordField.type = show ? 'text' : 'password';
+  if (confirmPasswordField) confirmPasswordField.type = show ? 'text' : 'password';
+}
+
+async function showForgotPassword() {
+  window.location.href = 'reset-password.html';
 }
 
 async function handleAuth() {
-  const email = document.getElementById('authEmail').value;
+  const email = document.getElementById('authEmail').value.trim();
   const password = document.getElementById('authPassword').value;
-  const name = document.getElementById('authName').value;
+  const name = document.getElementById('authName').value.trim();
+  const confirmPassword = document.getElementById('authConfirmPassword').value;
   const isSignup = document.getElementById('authTitle').textContent === 'Sign Up';
-  
+
   if (!email || !password) {
-    alert('Please fill in all fields');
+    setAuthStatus('❌ Please fill in email and password.', '#f87171');
     return;
   }
-  
+
+  if (isSignup) {
+    if (!name) {
+      setAuthStatus('❌ Please enter your full name.', '#f87171');
+      return;
+    }
+    if (!confirmPassword) {
+      setAuthStatus('❌ Please confirm your password.', '#f87171');
+      return;
+    }
+    if (password !== confirmPassword) {
+      setAuthStatus('❌ Passwords do not match.', '#f87171');
+      return;
+    }
+  }
+
+  setAuthStatus('⏳ Processing...', '#c3bfd0');
+
   try {
     const endpoint = isSignup ? '/auth/signup' : '/auth/login';
     const body = isSignup ? { email, name, password } : { email, password };
-    
+
     const data = await apiFetch(endpoint, {
       method: 'POST',
       body: JSON.stringify(body)
     });
-    
+
     if (data.success) {
       localStorage.setItem(CONFIG.STORAGE_KEY, data.token);
       window.state.user = data.user;
       closeAuthModal();
       showUserUI(data.user);
       if (data.user.isCreator) {
-        document.getElementById('creatorDashboard').style.display = 'block';
+        const creatorDashboardEl = document.getElementById('creatorDashboard');
+        if (creatorDashboardEl) {
+          creatorDashboardEl.style.display = 'block';
+        }
         loadMySongs();
       }
       location.reload();
     } else {
-      alert(data.error || 'Authentication failed');
+      setAuthStatus('❌ ' + (data.error || 'Authentication failed'), '#f87171');
     }
   } catch (e) {
-    alert('Network error. Please try again.');
+    setAuthStatus('❌ Network error. Please try again.', '#f87171');
   }
 }
 
+function handleGoogleCredential(response) {
+  if (!response || !response.credential) {
+    setAuthStatus('❌ Google sign-in failed.', '#f87171');
+    return;
+  }
+
+  apiFetch('/auth/google', {
+    method: 'POST',
+    body: JSON.stringify({ idToken: response.credential })
+  }).then((data) => {
+    if (data.success) {
+      localStorage.setItem(CONFIG.STORAGE_KEY, data.token);
+      window.state.user = data.user;
+      closeAuthModal();
+      showUserUI(data.user);
+      location.reload();
+    } else {
+      setAuthStatus('❌ ' + (data.error || 'Google login failed'), '#f87171');
+    }
+  }).catch(() => {
+    setAuthStatus('❌ Network error during Google login.', '#f87171');
+  });
+}
+
+function initGoogleLogin() {
+  if (!CONFIG.GOOGLE_CLIENT_ID || !window.google || !window.google.accounts || !window.google.accounts.id) {
+    return;
+  }
+
+  window.google.accounts.id.initialize({
+    client_id: CONFIG.GOOGLE_CLIENT_ID,
+    callback: handleGoogleCredential,
+    cancel_on_tap_outside: true
+  });
+}
+
 function loginWithGoogle() {
-  alert('Google login coming soon! Use email/password for now.');
+  if (!CONFIG.GOOGLE_CLIENT_ID) {
+    alert('Google login is not configured.');
+    return;
+  }
+
+  if (window.google && window.google.accounts && window.google.accounts.id) {
+    window.google.accounts.id.prompt();
+  } else {
+    alert('Google login is not ready yet. Please reload the page.');
+  }
 }
 
 function logout() {
@@ -322,11 +422,21 @@ function logout() {
   location.reload();
 }
 
+document.addEventListener('DOMContentLoaded', () => {
+  const showPasswordToggle = document.getElementById('authShowPassword');
+  if (showPasswordToggle) {
+    showPasswordToggle.addEventListener('change', togglePasswordVisibility);
+  }
+  initGoogleLogin();
+});
+
 // Expose to window
 window.showAuthModal = showAuthModal;
 window.closeAuthModal = closeAuthModal;
 window.toggleAuthMode = toggleAuthMode;
 window.handleAuth = handleAuth;
+window.showForgotPassword = showForgotPassword;
+window.showForgotPassword = showForgotPassword;
 window.loginWithGoogle = loginWithGoogle;
 window.logout = logout;
 window.promoteUserToCreator = promoteUserToCreator;
