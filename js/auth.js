@@ -348,19 +348,28 @@ async function handleAuth() {
       body: JSON.stringify(body)
     });
 
-    if (data.success) {
+    if (data.success && data.token) {
       localStorage.setItem(CONFIG.STORAGE_KEY, data.token);
-      window.state.user = data.user;
-      closeAuthModal();
-      showUserUI(data.user);
-      if (data.user.isCreator) {
-        const creatorDashboardEl = document.getElementById('creatorDashboard');
-        if (creatorDashboardEl) {
-          creatorDashboardEl.style.display = 'block';
+      // Verify token and get authoritative user object from server
+      try {
+        const verified = await apiFetch('/auth/verify');
+        if (verified.success && verified.user) {
+          window.state.user = verified.user;
+          closeAuthModal();
+          showUserUI(verified.user);
+          if (verified.user.isCreator) {
+            const creatorDashboardEl = document.getElementById('creatorDashboard');
+            if (creatorDashboardEl) creatorDashboardEl.style.display = 'block';
+            loadMySongs();
+          }
+          location.reload();
+          return;
         }
-        loadMySongs();
+        // fallback
+        setAuthStatus('❌ Authentication succeeded but verification failed', '#f87171');
+      } catch (e) {
+        setAuthStatus('❌ Authentication succeeded but verification failed', '#f87171');
       }
-      location.reload();
     } else {
       setAuthStatus('❌ ' + (data.error || 'Authentication failed'), '#f87171');
     }
@@ -378,13 +387,22 @@ function handleGoogleCredential(response) {
   apiFetch('/auth/google', {
     method: 'POST',
     body: JSON.stringify({ idToken: response.credential })
-  }).then((data) => {
-    if (data.success) {
+  }).then(async (data) => {
+    if (data.success && data.token) {
       localStorage.setItem(CONFIG.STORAGE_KEY, data.token);
-      window.state.user = data.user;
-      closeAuthModal();
-      showUserUI(data.user);
-      location.reload();
+      try {
+        const verified = await apiFetch('/auth/verify');
+        if (verified.success && verified.user) {
+          window.state.user = verified.user;
+          closeAuthModal();
+          showUserUI(verified.user);
+          location.reload();
+          return;
+        }
+        setAuthStatus('❌ Google login succeeded but verification failed', '#f87171');
+      } catch (e) {
+        setAuthStatus('❌ Google login succeeded but verification failed', '#f87171');
+      }
     } else {
       setAuthStatus('❌ ' + (data.error || 'Google login failed'), '#f87171');
     }
