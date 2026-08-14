@@ -9,6 +9,7 @@ function setupAudioControls() {
   if (!audio) return;
 
   const playBtn = document.getElementById('playBtn');
+  const stopBtn = document.getElementById('stopBtn');
   const progressBar = document.getElementById('progressBar');
   const timeDisplay = document.getElementById('timeDisplay');
   const volumeSlider = document.getElementById('volumeSlider');
@@ -17,7 +18,7 @@ function setupAudioControls() {
     audio.addEventListener('loadedmetadata', updateTimeDisplay);
   }
   
-  audio.addEventListener('timeupdate', () => {
+    audio.addEventListener('timeupdate', () => {
     updateTimeDisplay();
     
     const song = window.state.songs.find(s => s._id === window.state.currentSongId);
@@ -28,34 +29,49 @@ function setupAudioControls() {
     const songData = window.state.songs.find(s => s._id === window.state.currentSongId);
     if (songData && !window.state.unlocked && audio.currentTime >= (songData.previewDuration || 30)) {
       audio.pause();
-      playBtn.textContent = '▶';
-      playBtn.classList.remove('playing');
+      if (playBtn) {
+        playBtn.textContent = '▶';
+        playBtn.classList.remove('playing');
+      }
       const donationSection = document.getElementById('donationSection');
-      if (donationSection) {
-        donationSection.scrollIntoView({ behavior: 'smooth' });
-      }
-      
-      document.getElementById('donationMessage').innerHTML =
-        '❤️ <span>Preview complete. Donate to unlock the full song!</span>';
-      document.getElementById('donateStatus').textContent = '🎵 Donate to unlock the full song forever!';
+      if (donationSection) donationSection.scrollIntoView({ behavior: 'smooth' });
+
+      const donationMessage = document.getElementById('donationMessage');
+      const donateStatus = document.getElementById('donateStatus');
+      if (donationMessage) donationMessage.innerHTML = '❤️ <span>Preview complete. Donate to unlock the full song!</span>';
+      if (donateStatus) donateStatus.textContent = '🎵 Donate to unlock the full song forever!';
     }
   });
-  
-  playBtn.addEventListener('click', () => {
-    if (audio.paused) {
-      const song = window.state.songs.find(s => s._id === window.state.currentSongId);
-      if (!window.state.unlocked && audio.currentTime >= (song?.previewDuration || 30)) {
-        audio.currentTime = 0;
+  if (playBtn) {
+    playBtn.addEventListener('click', () => {
+      if (audio.paused) {
+        const song = window.state.songs.find(s => s._id === window.state.currentSongId);
+        if (!window.state.unlocked && audio.currentTime >= (song?.previewDuration || 30)) {
+          audio.currentTime = 0;
+        }
+        audio.play();
+        playBtn.textContent = '⏸';
+        playBtn.classList.add('playing');
+      } else {
+        audio.pause();
+        playBtn.textContent = '▶';
+        playBtn.classList.remove('playing');
       }
-      audio.play();
-      playBtn.textContent = '⏸';
-      playBtn.classList.add('playing');
-    } else {
+    });
+  }
+
+  if (stopBtn) {
+    stopBtn.addEventListener('click', () => {
       audio.pause();
-      playBtn.textContent = '▶';
-      playBtn.classList.remove('playing');
-    }
-  });
+      audio.currentTime = 0;
+      if (playBtn) {
+        playBtn.textContent = '▶';
+        playBtn.classList.remove('playing');
+      }
+      if (progressBar) progressBar.value = 0;
+      updateTimeDisplay();
+    });
+  }
   
   if (progressBar) {
     progressBar.addEventListener('input', (e) => {
@@ -72,9 +88,11 @@ function setupAudioControls() {
   }
   
   audio.addEventListener('ended', () => {
-    playBtn.textContent = '▶';
-    playBtn.classList.remove('playing');
-    progressBar.value = 0;
+    if (playBtn) {
+      playBtn.textContent = '▶';
+      playBtn.classList.remove('playing');
+    }
+    if (progressBar) progressBar.value = 0;
   });
 }
 
@@ -103,14 +121,21 @@ function playSong() {
   if (window.state.currentSongId) {
     apiFetch(`/songs/${window.state.currentSongId}/play`, { method: 'POST' }).catch(() => {});
   }
-
-  audio.play();
-  document.getElementById('playBtn').textContent = '⏸';
-  document.getElementById('playBtn').classList.add('playing');
+  if (!audio) return;
+  audio.play().catch(() => {});
+  const playBtnEl = document.getElementById('playBtn');
+  if (playBtnEl) {
+    playBtnEl.textContent = '⏸';
+    playBtnEl.classList.add('playing');
+  }
 }
 
 function pauseSong() {
+  if (!audio) return;
   audio.pause();
-  document.getElementById('playBtn').textContent = '▶';
-  document.getElementById('playBtn').classList.remove('playing');
+  const playBtnEl = document.getElementById('playBtn');
+  if (playBtnEl) {
+    playBtnEl.textContent = '▶';
+    playBtnEl.classList.remove('playing');
+  }
 }
