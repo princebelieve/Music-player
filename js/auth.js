@@ -60,8 +60,12 @@ function showUserUI(user) {
     if (uploadSongBtn) {
       uploadSongBtn.style.display = 'inline-block';
     }
-    loadMySongs();
-  } else {
+    if (typeof loadMySongs === 'function') {
+      loadMySongs();
+    } else {
+      console.warn('⚠️ loadMySongs is not available.');
+    }
+    } else {
     if (creatorDashboardMessage) {
       creatorDashboardMessage.textContent = 'You are signed in as a user. Request creator access or sign in as a creator to upload songs.';
     }
