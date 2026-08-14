@@ -67,6 +67,25 @@
         </div>
       </div>
 
+      <!-- Donation / Unlock Section -->
+      <div id="donationSection" style="width:100%;padding:16px 0;">
+        <div id="donationMessage" style="font-size:0.95rem;color:#6a5d4a;margin-bottom:8px;">✨ Support the artist</div>
+
+        <div id="donationAmounts" style="display:flex;gap:8px;margin-bottom:8px;">
+          <button data-amount="100" class="btn">₦100</button>
+          <button data-amount="250" class="btn">₦250</button>
+          <button data-amount="500" class="btn">₦500</button>
+          <button data-amount="custom" class="btn">Custom</button>
+          <input id="customAmount" type="number" placeholder="Custom" style="width:120px;padding:6px;border-radius:6px;border:1px solid #e5e7eb;" disabled>
+        </div>
+
+        <input id="donorEmail" type="email" placeholder="Your email" style="width:100%;padding:8px;border-radius:6px;border:1px solid #e5e7eb;margin-bottom:8px;">
+        <div style="display:flex;gap:8px;align-items:center;">
+          <button id="donateBtn" class="btn btn-primary">💖 Donate & Unlock</button>
+          <div id="donateStatus" class="donate-status" style="margin-left:8px;color:#8a7d6a;">✨ Share the blessing</div>
+        </div>
+      </div>
+
       <div class="content-grid" style="width:100%;padding:24px 0;">
         <h3>🎵 Song Library</h3>
         <div class="song-grid" id="songGrid">

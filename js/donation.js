@@ -3,20 +3,26 @@
 // ================================================
 
 async function checkUnlock(songId) {
-  if (!getToken()) {
-    updateUnlockUI(songId, false);
-    return;
-  }
-  
+  // If user is the uploader/creator, consider the song unlocked for them
   try {
+    const song = window.state.songs.find(s => s._id === songId);
+    const uploaderId = song && (song.uploadedBy && (song.uploadedBy._id || song.uploadedBy));
+    const currentUserId = window.state.user && window.state.user._id;
+    if (currentUserId && uploaderId && String(currentUserId) === String(uploaderId)) {
+      updateUnlockUI(songId, true);
+      return;
+    }
+
+    // Otherwise check server unlock records
     const email = window.state.user?.email || localStorage.getItem(CONFIG.EMAIL_KEY);
     const data = await apiFetch('/unlock/check', {
       method: 'POST',
       body: JSON.stringify({ email, songId })
     });
-    
-    updateUnlockUI(songId, data.unlocked);
+
+    updateUnlockUI(songId, !!data.unlocked);
   } catch (e) {
+    console.error('checkUnlock error:', e);
     updateUnlockUI(songId, false);
   }
 }

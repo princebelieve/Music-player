@@ -24,6 +24,10 @@ document.addEventListener('DOMContentLoaded', async () => {
   
   if (localStorage.getItem(CONFIG.STORAGE_KEY)) {
   await verifyToken();
+  // If user is a creator and loadMySongs is available, load their songs
+  if (window.state.user && window.state.user.isCreator && typeof loadMySongs === 'function') {
+    try { await loadMySongs(); } catch (e) { console.warn('loadMySongs failed', e); }
+  }
   }
   
   if (document.getElementById('songGrid') || document.getElementById('audioPlayer')) {
