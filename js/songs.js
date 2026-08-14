@@ -103,7 +103,20 @@ async function loadSong(songId) {
   
   const audioPlayer = document.getElementById('audioPlayer');
   if (audioPlayer) {
-    audioPlayer.src = song.audioUrl;
+    // Rewrite legacy R2 hostnames to the working media host if needed
+    let audioUrl = song.audioUrl || '';
+    try {
+      const u = new URL(audioUrl);
+      if (u.hostname.endsWith('r2.cloudflarestorage.com')) {
+        // Remove bucket segment if present
+        const parts = u.pathname.split('/').filter(Boolean);
+        if (parts[0] === (process.env?.R2_BUCKET_NAME || 'abanabame-media')) parts.shift();
+        audioUrl = `https://abanabame-media.globalcreest.com/${parts.join('/')}`;
+      }
+    } catch (e) {
+      // fallback: use original
+    }
+    audioPlayer.src = audioUrl || song.audioUrl;
     audioPlayer.load();
   }
   
