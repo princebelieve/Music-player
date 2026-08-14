@@ -465,10 +465,14 @@ function logout() {
 
 document.addEventListener('DOMContentLoaded', () => {
   const showPasswordToggle = document.getElementById('authShowPassword');
+
   if (showPasswordToggle) {
     showPasswordToggle.addEventListener('change', togglePasswordVisibility);
   }
+
   initGoogleLogin();
+
+  verifyToken();
 });
 
 // Expose to window
