@@ -904,6 +904,52 @@ body.mobile-nav-padding {
   display: none;
 }
 
+/* Upload panel and general page form controls */
+.upload-panel {
+  background: linear-gradient(180deg, rgba(18, 31, 55, 0.95), rgba(8, 16, 31, 0.92));
+  border-radius: 16px;
+  padding: 16px;
+  border: 1px solid rgba(255, 200, 120, 0.08);
+  box-shadow: 0 12px 30px rgba(0,0,0,0.28);
+}
+
+.upload-panel input,
+.upload-panel textarea,
+.content-grid input,
+.content-grid textarea,
+.donation-email input,
+.donation-custom input {
+  width: 100%;
+  padding: 10px 12px;
+  margin: 8px 0;
+  background: rgba(0,0,0,0.45);
+  border: 1px solid rgba(255,200,120,0.08);
+  border-radius: 10px;
+  color: #f0e0c0;
+  outline: none;
+  font-size: 0.95rem;
+}
+
+.upload-panel input::placeholder,
+.upload-panel textarea::placeholder,
+.content-grid input::placeholder,
+.content-grid textarea::placeholder {
+  color: #9a8f78;
+}
+
+/* File input label and filename visibility */
+.upload-panel input[type="file"] {
+  background: transparent;
+  border: none;
+  padding: 6px 0;
+  color: #f0e0c0;
+}
+
+.lyrics-preview-light {
+  background: #fafaf9;
+  color: #1a1a1a;
+}
+
 .creator-dashboard h3 {
   color: #f5c88a;
   font-weight: 400;
@@ -1054,5 +1100,43 @@ body.mobile-nav-padding {
   }
   .app-logo {
     font-size: 1rem;
+  }
+}
+
+/* Improve modal & form layout on small screens */
+@media (max-width: 600px) {
+  .modal-content {
+    padding: 18px;
+    max-width: 440px;
+    width: 96%;
+  }
+
+  .modal-content input,
+  .modal-content textarea {
+    font-size: 1rem;
+    padding: 12px 14px;
+  }
+
+  .modal-content .google-btn,
+  .modal-content .btn-primary,
+  .upload-btn,
+  .btn {
+    width: 100%;
+    padding: 12px 14px;
+    font-size: 1rem;
+  }
+
+  .modal-content textarea {
+    min-height: 120px;
+  }
+
+  .donation-email input,
+  .donation-custom input {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .mobile-pill-bar {
+    padding-left: 8px;
   }
 }

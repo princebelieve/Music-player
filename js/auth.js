@@ -79,12 +79,16 @@ function showUserUI(user) {
 
   const adminDashboard = document.getElementById('adminDashboard');
   const adminNotice = document.getElementById('adminNotice');
+  const adminBtn = document.getElementById('adminBtn');
   if (user.isAdmin && adminDashboard) {
     adminDashboard.style.display = 'block';
     if (adminNotice) {
       adminNotice.style.display = 'none';
     }
     loadAdminStats();
+  }
+  if (user.isAdmin && adminBtn) {
+    adminBtn.style.display = 'inline-block';
   }
 }
 

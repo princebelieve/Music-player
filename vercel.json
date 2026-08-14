@@ -14,6 +14,50 @@
       "dest": "/js/$1"
     },
     {
+      "src": "^/admin$",
+      "dest": "/admin.html"
+    },
+    {
+      "src": "^/creator$",
+      "dest": "/creator.html"
+    },
+    {
+      "src": "^/discover$",
+      "dest": "/discover.html"
+    },
+    {
+      "src": "^/forgot-password$",
+      "dest": "/forgot-password.html"
+    },
+    {
+      "src": "^/library$",
+      "dest": "/library.html"
+    },
+    {
+      "src": "^/payment-success$",
+      "dest": "/payment-success.html"
+    },
+    {
+      "src": "^/player$",
+      "dest": "/player.html"
+    },
+    {
+      "src": "^/profile$",
+      "dest": "/profile.html"
+    },
+    {
+      "src": "^/reset-password$",
+      "dest": "/reset-password.html"
+    },
+    {
+      "src": "^/trending$",
+      "dest": "/trending.html"
+    },
+    {
+      "src": "^/upload$",
+      "dest": "/upload.html"
+    },
+    {
       "src": "/",
       "dest": "/index.html"
     }

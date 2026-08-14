@@ -40,8 +40,10 @@ async function loadSongs() {
     }
   } catch (e) {
     console.error('Load songs error:', e);
-    document.getElementById('songGrid').innerHTML = 
-      '<div class="loading">Failed to load songs. Please refresh.</div>';
+    const grid = document.getElementById('songGrid');
+    if (grid) {
+      grid.innerHTML = '<div class="loading">Failed to load songs. Please refresh.</div>';
+    }
   }
 }
 
@@ -64,8 +66,10 @@ async function searchSongs(query) {
     }
   } catch (e) {
     console.error('Search songs error:', e);
-    document.getElementById('songGrid').innerHTML =
-      '<div class="loading">Search failed. Please try again.</div>';
+    const grid = document.getElementById('songGrid');
+    if (grid) {
+      grid.innerHTML = '<div class="loading">Search failed. Please try again.</div>';
+    }
   }
 }
 
@@ -88,10 +92,14 @@ async function loadSong(songId) {
   if (!song) return;
   
   // Update UI
-  document.getElementById('currentTitle').textContent = song.title;
-  document.getElementById('currentArtist').textContent = song.artist;
-  document.getElementById('currentCover').src = song.coverUrl;
-  document.getElementById('donationSongName').textContent = song.title;
+  const titleEl = document.getElementById('currentTitle');
+  if (titleEl) titleEl.textContent = song.title;
+  const artistEl = document.getElementById('currentArtist');
+  if (artistEl) artistEl.textContent = song.artist;
+  const coverEl = document.getElementById('currentCover');
+  if (coverEl) coverEl.src = song.coverUrl;
+  const donationNameEl = document.getElementById('donationSongName');
+  if (donationNameEl) donationNameEl.textContent = song.title;
   
   const audioPlayer = document.getElementById('audioPlayer');
   if (audioPlayer) {
@@ -159,12 +167,14 @@ function renderLyrics(lyrics, currentTime) {
 
 function renderLibrary() {
   const grid = document.getElementById('songGrid');
-  
+
+  if (!grid) return;
+
   if (!window.state.songs || window.state.songs.length === 0) {
     grid.innerHTML = '<div class="loading">No songs available</div>';
     return;
   }
-  
+
   grid.innerHTML = window.state.songs.map(song => `
     <div class="song-card" data-song-id="${song._id}" onclick="window.loadSong('${song._id}')">
       <img src="${song.coverUrl}" alt="${song.title}" loading="lazy">
