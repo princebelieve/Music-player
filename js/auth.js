@@ -4,16 +4,26 @@
 
 async function verifyToken() {
   try {
+    const token = localStorage.getItem(CONFIG.STORAGE_KEY);
+
+    console.log('🔍 VERIFY TOKEN: token exists =', Boolean(token));
+    console.log('🔍 VERIFY TOKEN: key =', CONFIG.STORAGE_KEY);
+
     const data = await apiFetch('/auth/verify');
+
+    console.log('🔍 VERIFY RESPONSE:', data);
+
     if (data.success) {
       window.state.user = data.user;
       showUserUI(data.user);
       return true;
     }
-    localStorage.removeItem(CONFIG.STORAGE_KEY);
+
+    console.error('❌ VERIFY FAILED — token will NOT be removed yet');
     return false;
+
   } catch (e) {
-    localStorage.removeItem(CONFIG.STORAGE_KEY);
+    console.error('❌ VERIFY ERROR:', e);
     return false;
   }
 }

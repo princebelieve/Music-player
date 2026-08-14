@@ -22,8 +22,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     setupSearchControls();
   }
   
-  if (window.state.token) {
-    await verifyToken();
+  if (localStorage.getItem(CONFIG.STORAGE_KEY)) {
+  await verifyToken();
   }
   
   if (document.getElementById('songGrid') || document.getElementById('audioPlayer')) {
