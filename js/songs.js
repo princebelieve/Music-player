@@ -88,7 +88,24 @@ async function loadFeaturedSongs() {
 
 async function loadSong(songId) {
   window.state.currentSongId = songId;
-  const song = window.state.songs.find(s => s._id === songId);
+  let song = window.state.songs.find(s => s._id === songId);
+  // If song is not in the public list (e.g. creator's own pending song), fetch it
+  if (!song) {
+    try {
+      const data = await apiFetch(`/songs/${songId}`);
+      if (data && data.success && data.song) {
+        song = data.song;
+        // add to state so UI can reflect it
+        window.state.songs = window.state.songs || [];
+        // avoid duplicates
+        if (!window.state.songs.find(s => s._id === song._id)) {
+          window.state.songs.unshift(song);
+        }
+      }
+    } catch (e) {
+      console.error('Failed to fetch song:', e);
+    }
+  }
   if (!song) return;
   
   // Update UI
@@ -140,7 +157,13 @@ async function loadLyrics(songId) {
     });
     
     if (data.success) {
-      renderLyrics(data.lyrics, 0);
+      // If client believes the song is unlocked (e.g. uploader/creator), prefer full song lyrics
+      const song = window.state.songs.find(s => s._id === songId);
+      if (window.state.unlocked && song && Array.isArray(song.lyrics) && song.lyrics.length > 0) {
+        renderLyrics(song.lyrics, 0);
+      } else {
+        renderLyrics(data.lyrics, 0);
+      }
     }
   } catch (e) {
     console.error('Load lyrics error:', e);
